@@ -30,20 +30,20 @@ createConnection(config as ConnectionOptions).then(async (connection) => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
 
-  app.use("/users", authenticationRouter);
-  app.use("/usersinfo", userinfoRouter);
-  app.use("/categorys", categoryRouter);
-  app.use("/subcategorys", subcategoryRouter);
-  app.use("/fullscreenposts", fullscreenpostRouter);
-  app.use("/posts", postRouter);
-  app.use("/likes", likeRouter);
-  app.use("/connetions", connectionRouter);
-  app.use("/bookmark", bookmarkRouter);
-  app.use("/download", downloadRouter);
-  app.use("/comment", commentRouter);
-  app.use("/share",shareRouter);
-  app.use("/view",viewsRouter);
-  app.use("/reward",rewardRouter);
+  app.use("/api/users", authenticationRouter);
+  app.use("/api/usersinfo", userinfoRouter);
+  app.use("/api/categorys", categoryRouter);
+  app.use("/api/subcategorys", subcategoryRouter);
+  app.use("/api/fullscreenposts", fullscreenpostRouter);
+  app.use("/api/posts", postRouter);
+  app.use("/api/likes", likeRouter);
+  app.use("/api/connetions", connectionRouter);
+  app.use("/api/bookmark", bookmarkRouter);
+  app.use("/api/download", downloadRouter);
+  app.use("/api/comment", commentRouter);
+  app.use("/api/share",shareRouter);
+  app.use("/api/view",viewsRouter);
+  app.use("/api/reward",rewardRouter);
 
   app.set("port", port);
   app.listen(app.get("port"), () => {

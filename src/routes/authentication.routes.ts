@@ -16,12 +16,11 @@ authenticationRouter.get("/checkuser/:useremail",AuthenticationControllers.check
 authenticationRouter.get("/fetchuser/:useremail",AuthenticationControllers.fetchUserData);
 authenticationRouter.get("/fetchuserinfo/:useremail",AuthenticationControllers.fetchUserInfoData);
 authenticationRouter.get("/fetchuserconnection/:user_email",AuthenticationControllers.fetchuserMyConnection);
-
 //!update
 authenticationRouter.put("/updaterewardamout", AuthenticationControllers.updateamountpoint);
 authenticationRouter.put("/updatetodaypoint", AuthenticationControllers.updatetodaypoint);
 authenticationRouter.put("/updaterewardlowpoint", AuthenticationControllers.updatewithlowamountpoint);
-
+authenticationRouter.put("/updateuserpaymentid", AuthenticationControllers.updatetodaypaymentid);
 export { authenticationRouter };
 
 

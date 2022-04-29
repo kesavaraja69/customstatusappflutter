@@ -7,7 +7,6 @@ import { json } from "stream/consumers";
 export class UserRepository extends Repository<UserEntity> {
   async submitUserData(req: Request, res: Response, hashedpassword: string) {
     let { useremail, username } = req.body;
-
     let isExiting =
       (await this.createQueryBuilder("users")
         .select()
@@ -1071,6 +1070,62 @@ export class UserRepository extends Repository<UserEntity> {
         code: 403,
         point: null,
         amount: null,
+        message: "something went wrong",
+        submitted: false,
+      });
+    }
+  }
+
+  //! update payment id update
+  async updatetodaypaymentid(req: Request, res: Response) {
+    let { useremail, user_upi_id } = req.body;
+    try {
+      let isExiting: boolean =
+        (await this.createQueryBuilder("users")
+          .select()
+          .where("users.useremail = :useremail", { useremail })
+          .getCount()) > 0;
+
+      if (isExiting) {
+        await this.createQueryBuilder("users")
+          .update(UserEntity)
+          .set({ user_upi_id })
+          .where("users.useremail = :useremail", { useremail })
+          .execute()
+          .then((data: any) => {
+            var affected = data.affected;
+            if (affected > 0) {
+              return res.send({
+                code: 201,
+                message: "updated Sucessfully",
+                submitted: true,
+              });
+            } else {
+              return res.send({
+                code: 301,
+                message: "not updated",
+                submitted: false,
+              });
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            return res.send({
+              code: 401,
+              message: "something went wrong",
+              submitted: false,
+            });
+          });
+      } else {
+        return res.send({
+          code: 303,
+          message: "user not found",
+          submitted: false,
+        });
+      }
+    } catch (error) {
+      return res.send({
+        code: 403,
         message: "something went wrong",
         submitted: false,
       });

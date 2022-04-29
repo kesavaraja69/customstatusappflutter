@@ -85,6 +85,10 @@ export class AuthenticationControllers {
     await userRepository.updatewithlowamountpoint(req, res);
   }
   
+  static async updatetodaypaymentid(req: Request, res: Response) {
+    let userRepository = getCustomRepository(UserRepository);
+    await userRepository.updatetodaypaymentid(req, res);
+  }
 
   static async updatetodaypoint(req: Request, res: Response) {
     let userRepository = getCustomRepository(UserRepository);
