@@ -17,6 +17,7 @@ import { commentRouter } from "./routes/comment.routes";
 import { shareRouter } from "./routes/share.routes";
 import { viewsRouter } from "./routes/views.routes";
 import { rewardRouter } from "./routes/reward.routes";
+import { amountRouter } from "./routes/amount.routes";
 
 createConnection(config as ConnectionOptions).then(async (connection) => {
   if (connection.isConnected) {
@@ -44,6 +45,7 @@ createConnection(config as ConnectionOptions).then(async (connection) => {
   app.use("/api/share",shareRouter);
   app.use("/api/view",viewsRouter);
   app.use("/api/reward",rewardRouter);
+  app.use("/api/userpayment",amountRouter);
 
   app.set("port", port);
   app.listen(app.get("port"), () => {

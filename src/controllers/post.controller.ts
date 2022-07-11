@@ -11,6 +11,11 @@ export class PostController {
       let subcategoryRepository = getCustomRepository(PostRepository);
       await subcategoryRepository.fetchPost(req, res);
     }
+    static async fetchPostbycateroyid(req: Request, res: Response) {
+      let subcategoryRepository = getCustomRepository(PostRepository);
+      await subcategoryRepository.fetchPostbycateroyid(req, res);
+    }
+    
     static async fetchpostdetail(req: Request, res: Response) {
       let subcategoryRepository = getCustomRepository(PostRepository);
       await subcategoryRepository.fetchpostdetail(req, res);

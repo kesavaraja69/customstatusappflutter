@@ -17,6 +17,10 @@ export class FullScreenVideoController {
       let subcategoryRepository = getCustomRepository(FullScreenPostRepository);
       await subcategoryRepository.fetchFullScreenPost(req, res);
     }
+    static async fetchFullScreenPostbycategoryid(req: Request, res: Response) {
+      let subcategoryRepository = getCustomRepository(FullScreenPostRepository);
+      await subcategoryRepository.fetchFullScreenPostbycategoryid(req, res);
+    }
     static async fetchallFullScreenPost(req: Request, res: Response) {
       let subcategoryRepository = getCustomRepository(FullScreenPostRepository);
       await subcategoryRepository.fetchallFullScreenPost(req, res);

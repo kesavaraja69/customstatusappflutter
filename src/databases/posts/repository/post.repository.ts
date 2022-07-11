@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { PostEntity } from "../entity/post.entity";
 import { SubCategoryRepository } from "../../subcategory/repository/subcategory.repository";
 import { UserRepository } from "../../authentication/repository/users.repositroy";
+import { CategoryRepository } from "../../categorys/repositroy/category.repositroy";
 
 dotenv.config();
 @EntityRepository(PostEntity)
@@ -23,12 +24,12 @@ export class PostRepository extends Repository<PostEntity> {
       post_video_url,
       post_yt_video_url,
       post_isyoutubevideo,
-      post_isvideo_portrait
+      post_isvideo_portrait,
     } = req.body;
 
-    let subcategoryRepository = getCustomRepository(SubCategoryRepository);
-    let parentsub_category_id = await subcategoryRepository.findOne({
-      sub_category_id: category_id,
+    let maincategoryRepository = getCustomRepository(CategoryRepository);
+    let parentsub_category_id = await maincategoryRepository.findOne({
+      category_id: category_id,
     });
     let userRepository = getCustomRepository(UserRepository);
     let user = await userRepository.findOne({ useremail });
@@ -51,7 +52,7 @@ export class PostRepository extends Repository<PostEntity> {
       postentity.post_isvideo_portrait = post_isvideo_portrait;
       postentity.post_isyoutubevideo = post_isyoutubevideo;
       postentity.post_view = "0";
-      postentity.subcategoryposts = parentsub_category_id!;
+      postentity.maincategoryposts = parentsub_category_id!;
       await postentity
         .save()
         .then((data: any) => {
@@ -116,21 +117,61 @@ export class PostRepository extends Repository<PostEntity> {
     }
   }
 
+  async fetchPostbycateroyid(req: Request, res: Response) {
+    let { parent_category_id } = req.params;
+    try {
+      let post = await this.createQueryBuilder("post")
+        .leftJoinAndSelect("post.maincategoryposts", "category")
+        .leftJoinAndSelect("post.upload_user", "users")
+        .leftJoinAndSelect("users.info", "usersinfo")
+        .select([
+          "post",
+          "users.id",
+          "users.useremail",
+          "users.username",
+          "usersinfo.info_id",
+          "usersinfo.profileimage",
+        ])
+        .andWhere("category.category_id = :parent_category_id", {
+          parent_category_id,
+        })
+        .getMany();
+
+      if (post !== undefined) {
+        res.send({
+          code: 201,
+          data: post,
+          message: "Fetched Sucessfully",
+          received: true,
+        });
+      }
+    } catch (error) {
+      if (error) {
+        res.send({
+          code: 402,
+          data: null,
+          message: "something went wrong,try again",
+          received: false,
+        });
+      }
+    }
+  }
+
   async fetchPostrandomly(req: Request, res: Response) {
     try {
       let post = await this.createQueryBuilder("post")
         .leftJoinAndSelect("post.upload_user", "users")
         .leftJoinAndSelect("users.info", "usersinfo")
-       // .from(PostEntity,"post")
-       .select([
-        "post",
-        "users.id",
-        "users.useremail",
-        "users.username",
-        "usersinfo.info_id",
-        "usersinfo.profileimage",
-      ])
-        .orderBy('RANDOM()')
+        // .from(PostEntity,"post")
+        .select([
+          "post",
+          "users.id",
+          "users.useremail",
+          "users.username",
+          "usersinfo.info_id",
+          "usersinfo.profileimage",
+        ])
+        .orderBy("RANDOM()")
         .limit(4)
         .getMany();
 

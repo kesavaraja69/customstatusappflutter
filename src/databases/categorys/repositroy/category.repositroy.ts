@@ -84,6 +84,7 @@ export class CategoryRepository extends Repository<CategoryEntity> {
         .leftJoinAndSelect("category.sub_category", "subcategory")
         .leftJoinAndSelect("subcategory.fullScreen_post", "fullscreenpost")
         .leftJoinAndSelect("subcategory.posts", "post")
+        .leftJoinAndSelect("post.upload_user", "users")
         .andWhere("category.category_id = :parent_category_id", {
           parent_category_id,
         })

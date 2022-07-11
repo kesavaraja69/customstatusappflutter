@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { UserEntity } from "../../authentication/entity/users.entity";
 import { BookmarkEntity } from "../../bookmark/entity/bookmark.entity";
+import { CategoryEntity } from "../../categorys/entity/category.entity";
 import { CommentEntity } from "../../comments/entity/comment.entity";
 import { DownloadEntity } from "../../downloads/entity/download.entity";
 import { LikeEntity } from "../../likes/entity/likes.entity";
@@ -70,6 +71,13 @@ export class FullScreenPostEntity extends BaseEntity {
   )
   category_post!: SubCategoryEntity;
 
+   //! connection to parentcategory
+   @ManyToOne(
+    () => CategoryEntity,
+    (maincategory_post) => maincategory_post.fullScreen_post
+  )
+  maincategory_post!: CategoryEntity;
+
   //! connection to users
   @ManyToOne(() => UserEntity, (upload_user) => upload_user.fullscreenvideo, {
     onDelete: "CASCADE",
@@ -116,3 +124,4 @@ export class FullScreenPostEntity extends BaseEntity {
   @JoinColumn()
   post_fs_comment!: CommentEntity[];
 }
+

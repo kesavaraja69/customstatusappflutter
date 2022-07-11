@@ -10,6 +10,7 @@ import {
 } from "typeorm";
 import { UserEntity } from "../../authentication/entity/users.entity";
 import { BookmarkEntity } from "../../bookmark/entity/bookmark.entity";
+import { CategoryEntity } from "../../categorys/entity/category.entity";
 import { CommentEntity } from "../../comments/entity/comment.entity";
 import { DownloadEntity } from "../../downloads/entity/download.entity";
 import { LikeEntity } from "../../likes/entity/likes.entity";
@@ -95,6 +96,13 @@ export class PostEntity extends BaseEntity {
     (subcategoryposts) => subcategoryposts.posts
   )
   subcategoryposts!: SubCategoryEntity;
+
+    //! connection to maincategory
+    @ManyToOne(
+      () => CategoryEntity,
+      (maincategoryposts) => maincategoryposts.posts
+    )
+    maincategoryposts!: CategoryEntity;
 
   //! connection to like entity
   @OneToMany(() => LikeEntity, (post_likes) => post_likes.likes_post)

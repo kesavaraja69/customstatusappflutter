@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { FullScreenPostEntity } from "../entity/postfullscreen.entity";
 import { SubCategoryRepository } from "../../subcategory/repository/subcategory.repository";
 import { UserRepository } from "../../authentication/repository/users.repositroy";
+import { CategoryRepository } from "../../categorys/repositroy/category.repositroy";
 dotenv.config();
 @EntityRepository(FullScreenPostEntity)
 export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
@@ -21,9 +22,9 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       useremail,
     } = req.body;
 
-    let subcategoryRepository = getCustomRepository(SubCategoryRepository);
-    let parentsub_category_id = await subcategoryRepository.findOne({
-      sub_category_id: category_id,
+    let maincategoryRepository = getCustomRepository(CategoryRepository);
+    let parentsub_category_id = await maincategoryRepository.findOne({
+      category_id: category_id,
     });
     let userRepository = getCustomRepository(UserRepository);
     let user = await userRepository.findOne({ useremail });
@@ -43,7 +44,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       fullscreenentity.fs_post_imageurl = fs_post_imageurl;
       fullscreenentity.fs_post_category = fs_post_category;
       fullscreenentity.fs_post_view = "0";
-      fullscreenentity.category_post = parentsub_category_id!;
+      fullscreenentity.maincategory_post = parentsub_category_id!;
 
       await fullscreenentity
         .save()
@@ -157,6 +158,50 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           "usersinfo.info_id",
           "usersinfo.profileimage",
         ])
+        .getMany();
+      if (fullscreenpost !== undefined) {
+        res.send({
+          code: 201,
+          data: fullscreenpost,
+          received: true,
+        });
+      }else{
+        res.send({
+          code: 302,
+          data: null,
+          received: true,
+        });
+      }
+    } catch (error) {
+      if (error) {
+        res.send({
+          code: 402,
+          data: "something went wrong,try again",
+          received: false,
+        });
+      }
+    }
+  }
+
+  async fetchFullScreenPostbycategoryid(req: Request, res: Response) {
+    let { parent_category_id } = req.params;
+    try {
+      let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
+      .leftJoinAndSelect("fullscreenpost.category_post", "subcategory")
+      .leftJoinAndSelect("subcategory.parent_catergory", "category")
+        .leftJoinAndSelect("fullscreenpost.upload_user", "users")
+        .leftJoinAndSelect("users.info", "usersinfo")
+        .select([
+          "fullscreenpost",
+          "users.id",
+          "users.useremail",
+          "users.username",
+          "usersinfo.info_id",
+          "usersinfo.profileimage",
+        ])
+        .andWhere("category.category_id = :parent_category_id", {
+          parent_category_id,
+        })
         .getMany();
       if (fullscreenpost !== undefined) {
         res.send({

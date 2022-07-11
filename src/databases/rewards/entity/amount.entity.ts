@@ -21,8 +21,9 @@ export class AmountEntity extends BaseEntity {
 
   @Column({
     nullable: false,
+    default: "0",
   })
-  reward_All_amount!: string;
+  payout_All_amount!: string;
 
   @Column({
     default: false,

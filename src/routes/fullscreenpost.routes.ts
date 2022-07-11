@@ -5,7 +5,7 @@ const fullscreenpostRouter = Router();
 //!get
 fullscreenpostRouter.get("/", FullScreenVideoController.fetchFullScreenPost);
 fullscreenpostRouter.get("/withlimit/:count", FullScreenVideoController.fetchFullScreenPostwithlimit);
-
+fullscreenpostRouter.get("/fetchfullscreenbycategoryid/:parent_category_id", FullScreenVideoController.fetchFullScreenPostbycategoryid);
 fullscreenpostRouter.get("/all/:sub_category_id/:parent_category_id", FullScreenVideoController.fetchallFullScreenPost);
 fullscreenpostRouter.get("/allfullscreenpost/:useremail", FullScreenVideoController.fetchFullScreenPostbyuser);
 fullscreenpostRouter.get("/fullscreenpostdetail/:detail_id", FullScreenVideoController.fetchFullScreenPostDetailPage);
