@@ -16,6 +16,8 @@ import { ShareEntity } from "./databases/share/entity/share.entity";
 import { ViewsEntity } from "./databases/views/entity/views.entity";
 import { RewardEntity } from "./databases/rewards/entity/reward.entity";
 import { AmountEntity } from "./databases/rewards/entity/amount.entity";
+import { ContactusEntity } from "./databases/contactus/enitiy/contactus.entity";
+import { ReportsEntity } from "./databases/reports/entity/reports.entity";
 
 dotenv.config();
 const connectionOptions: ConnectionOptions = {
@@ -43,7 +45,9 @@ const connectionOptions: ConnectionOptions = {
     ShareEntity,
     ViewsEntity,
     RewardEntity,
-    AmountEntity
+    AmountEntity,
+    ContactusEntity,
+    ReportsEntity
   ],
 //   extra: {
 //     ssl: {

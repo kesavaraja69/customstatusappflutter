@@ -11,10 +11,12 @@ import {
 import { BookmarkEntity } from "../../bookmark/entity/bookmark.entity";
 import { CommentEntity } from "../../comments/entity/comment.entity";
 import { ConnectionEntity } from "../../connetcions/entity/connections.entity";
+import { ContactusEntity } from "../../contactus/enitiy/contactus.entity";
 import { DownloadEntity } from "../../downloads/entity/download.entity";
 import { LikeEntity } from "../../likes/entity/likes.entity";
 import { PostEntity } from "../../posts/entity/post.entity";
 import { FullScreenPostEntity } from "../../post_fullscreen/entity/postfullscreen.entity";
+import { ReportsEntity } from "../../reports/entity/reports.entity";
 import { AmountEntity } from "../../rewards/entity/amount.entity";
 import { RewardEntity } from "../../rewards/entity/reward.entity";
 import { ShareEntity } from "../../share/entity/share.entity";
@@ -87,6 +89,20 @@ export class UserEntity extends BaseEntity {
   )
   @JoinColumn()
   fullscreenvideo!: FullScreenPostEntity[];
+
+  @OneToMany(
+    () => ContactusEntity,
+    (contactus) => contactus.log_user
+  )
+  @JoinColumn()
+  contactus!: ContactusEntity[];
+
+  @OneToMany(
+    () => ReportsEntity,
+    (reports) => reports.log_user
+  )
+  @JoinColumn()
+  reports!: ReportsEntity[];
 
   @OneToMany(() => PostEntity, (post) => post.upload_user)
   @JoinColumn()

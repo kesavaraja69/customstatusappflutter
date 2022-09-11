@@ -104,24 +104,89 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
     }
   }
 
-  //! fetch fullscreenpost with limit 
+  async fetchfullscreenuserBookmark(req: Request, res: Response) {
+    try {
+      let { useremail } = req.params;
+
+      var response = await this.createQueryBuilder("fullscreenpost")
+        // .leftJoinAndSelect("fullscreenpost.upload_user", "users")
+        .leftJoinAndSelect("fullscreenpost.post_fs_bookmark", "bookmark")
+        .leftJoin("bookmark.bookmark_user", "users")
+        .leftJoinAndSelect("users.info", "usersinfo")
+        .select(["fullscreenpost", "bookmark.bookmark_id"])
+        .andWhere("users.useremail = :useremail", {
+          useremail,
+        })
+        .getMany();
+      if (response !== undefined) {
+        return res.send({
+          code: 201,
+          data: response,
+        });
+      } else {
+        return res.send({
+          code: 301,
+          data: "no data available",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async fetchfullscreenuploaduserprofile(req: Request, res: Response) {
+    try {
+      let { fs_post_id } = req.params;
+
+      var response = await this.createQueryBuilder("fullscreenpost")
+        .leftJoin("fullscreenpost.upload_user", "users")
+        .leftJoinAndSelect("users.info", "usersinfo")
+        .select([
+          "fullscreenpost",
+          "users.id",
+          "users.useremail",
+          "users.username",
+          "usersinfo.info_id",
+          "usersinfo.profileimage",
+        ])
+        .andWhere("fullscreenpost.fs_post_id = :fs_post_id", {
+          fs_post_id,
+        })
+        .getOne();
+      if (response !== undefined) {
+        return res.send({
+          code: 201,
+          data: response,
+        });
+      } else {
+        return res.send({
+          code: 301,
+          data: "no data available",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  //! fetch fullscreenpost with limit
   async fetchFullScreenPostwithlimit(req: Request, res: Response) {
-   let { count} = req.params;
+    let { count } = req.params;
     const dataindex: any = count;
     try {
       let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
-      .leftJoinAndSelect("fullscreenpost.upload_user", "users")
-      .leftJoinAndSelect("users.info", "usersinfo")
-      .take(dataindex)
-      .select([
-        "fullscreenpost",
-        "users.id",
-        "users.useremail",
-        "users.username",
-        "usersinfo.info_id",
-        "usersinfo.profileimage",
-      ])
-      .getMany();
+        .leftJoinAndSelect("fullscreenpost.upload_user", "users")
+        .leftJoinAndSelect("users.info", "usersinfo")
+        .take(dataindex)
+        .select([
+          "fullscreenpost",
+          "users.id",
+          "users.useremail",
+          "users.username",
+          "usersinfo.info_id",
+          "usersinfo.profileimage",
+        ])
+        .getMany();
 
       if (fullscreenpost !== undefined) {
         res.send({
@@ -165,7 +230,95 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           data: fullscreenpost,
           received: true,
         });
-      }else{
+      } else {
+        res.send({
+          code: 302,
+          data: null,
+          received: true,
+        });
+      }
+    } catch (error) {
+      if (error) {
+        res.send({
+          code: 402,
+          data: "something went wrong,try again",
+          received: false,
+        });
+      }
+    }
+  }
+  //! approved all fullscreen posts
+  async fetchFullScreenPostappall(req: Request, res: Response) {
+    let { isapproved } = req.params;
+    try {
+      let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
+        .leftJoinAndSelect("fullscreenpost.upload_user", "users")
+        .leftJoinAndSelect("users.info", "usersinfo")
+        .select([
+          "fullscreenpost",
+          "users.id",
+          "users.useremail",
+          "users.username",
+          "usersinfo.info_id",
+          "usersinfo.profileimage",
+        ])
+        .where("fullscreenpost.fs_post_isapproved = :fs_post_isapproved", {
+          fs_post_isapproved: isapproved,
+        })
+        .getMany();
+      if (fullscreenpost !== undefined) {
+        res.send({
+          code: 201,
+          data: fullscreenpost,
+          message :"data is available",
+          received: true,
+        });
+      } else {
+        res.send({
+          code: 302,
+          data: null,
+          message :"data not found",
+          received: false,
+        });
+      }
+    } catch (error) {
+      if (error) {
+        res.send({
+          code: 402,
+          data: null,
+          message :"something went wrong,try again",
+          received: false,
+        });
+      }
+    }
+  }
+
+  //! not approved all fullscreen posts
+  async fetchFullScreenPostallnotapproved(req: Request, res: Response) {
+    try {
+      let item;
+      let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
+        .leftJoinAndSelect("fullscreenpost.upload_user", "users")
+        .leftJoinAndSelect("users.info", "usersinfo")
+        .select([
+          "fullscreenpost",
+          "users.id",
+          "users.useremail",
+          "users.username",
+          "usersinfo.info_id",
+          "usersinfo.profileimage",
+        ])
+        .where("fullscreenpost.fs_post_isapproved = :fs_post_isapproved", {
+          fs_post_isapproved: "false",
+        })
+        .getMany();
+      if (fullscreenpost !== undefined) {
+        res.send({
+          code: 201,
+          data: fullscreenpost,
+          received: true,
+        });
+      } else {
         res.send({
           code: 302,
           data: null,
@@ -187,8 +340,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
     let { parent_category_id } = req.params;
     try {
       let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
-      .leftJoinAndSelect("fullscreenpost.category_post", "subcategory")
-      .leftJoinAndSelect("subcategory.parent_catergory", "category")
+        .leftJoinAndSelect("fullscreenpost.maincategory_post", "category")
         .leftJoinAndSelect("fullscreenpost.upload_user", "users")
         .leftJoinAndSelect("users.info", "usersinfo")
         .select([
@@ -209,7 +361,40 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           data: fullscreenpost,
           received: true,
         });
-      }else{
+      } else {
+        res.send({
+          code: 302,
+          data: null,
+          received: true,
+        });
+      }
+    } catch (error) {
+      if (error) {
+        res.send({
+          code: 402,
+          data: "something went wrong,try again",
+          received: false,
+        });
+      }
+    }
+  }
+
+  async fetchdownloadsFullScreenPostbyuser(req: Request, res: Response) {
+    let { useremail } = req.params;
+    try {
+      let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
+        .leftJoinAndSelect("fullscreenpost.post_fs_download", "download")
+        .leftJoin("download.downloads_user", "users")
+        .select(["fullscreenpost", "download.download_id"])
+        .andWhere("users.useremail = :useremail", { useremail })
+        .getMany();
+      if (fullscreenpost !== undefined) {
+        res.send({
+          code: 201,
+          data: fullscreenpost,
+          received: true,
+        });
+      } else {
         res.send({
           code: 302,
           data: null,
@@ -249,7 +434,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           data: fullscreenpost,
           received: true,
         });
-      }else{
+      } else {
         res.send({
           code: 302,
           data: null,
@@ -338,7 +523,6 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
 
   async isapprovedfullscreenpost(req: Request, res: Response) {
     let { fs_post_isapproved, fs_post_id } = req.body;
-
     let admin_token = req.headers.authorization;
     let base_admin_sceret_kry = process.env.ADMIN_SCRECT_PASSWORD;
 

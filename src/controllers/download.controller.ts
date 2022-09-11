@@ -19,11 +19,21 @@ export class DownloadController {
     let downloadRepository = getCustomRepository(DownloadRepositiory);
     await downloadRepository.removedownload(req, res);
   }
+  
+  static async fetchDownloadsbyuser(req: Request, res: Response) {
+    let downloadRepository = getCustomRepository(DownloadRepositiory);
+    await downloadRepository.fetchDownloadsbyuser(req, res);
+  }
 
   //! post
   static async addDownloadpost(req: Request, res: Response) {
     let downloadRepository = getCustomRepository(DownloadRepositiory);
     await downloadRepository.addDownloadpost(req, res);
+  }
+
+  static async fetchpostDownloadsbyuser(req: Request, res: Response) {
+    let downloadRepository = getCustomRepository(DownloadRepositiory);
+    await downloadRepository.fetchpostDownloadsbyuser(req, res);
   }
 
   static async checkuserDownloadpost(req: Request, res: Response) {

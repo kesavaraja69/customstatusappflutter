@@ -5,13 +5,20 @@ const postRouter = Router();
 //!get
 postRouter.get("/", PostController.fetchPost);
 postRouter.get("/fetachpostbycategory/:parent_category_id", PostController.fetchPostbycateroyid);
-
 postRouter.get("/fetchpostrandomly", PostController.fetchPostrandomly);
 postRouter.get("/fetchdetailpost/:post_id", PostController.fetchpostdetail);
-postRouter.get("/fetchuserallpost/:useremail", PostController.fetchallPostbyuser);
+postRouter.get("/fetchdetailpostupldprofile/:post_id", PostController.fetchpostuploaduserprofile);
+
+postRouter.get("/fetchuserallappposts/:isapproved", PostController.fetchFullPostappall);
+postRouter.get("/fetchuserallposts/:useremail", PostController.fetchallPostbyuser);
+postRouter.get("/fetchuserallpostbokmark/:useremail", PostController.fetchpostuserBookmark);
+postRouter.get("/fetchuserallpostdownloads/:useremail", PostController.fetchdownloadsPostbyuser);
+
 postRouter.get("/fetchcommentpost/:post_id", PostController.fetchCommentpost);
 //!post
 postRouter.post("/addpost/:category_id", PostController.submitPost);
-postRouter.post("/approveduserpost", PostController.isapprovedpost);
+
 postRouter.post("/addviewpost", PostController.addviewpost);
+//! update
+postRouter.put("/approveduserpost", PostController.isapprovedpost);
 export { postRouter };

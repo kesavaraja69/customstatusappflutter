@@ -15,6 +15,21 @@ export class PostController {
       let subcategoryRepository = getCustomRepository(PostRepository);
       await subcategoryRepository.fetchPostbycateroyid(req, res);
     }
+
+    static async fetchpostuserBookmark(req: Request, res: Response) {
+      let subcategoryRepository = getCustomRepository(PostRepository);
+      await subcategoryRepository.fetchpostuserBookmark(req, res);
+    }
+    
+    static async fetchdownloadsPostbyuser(req: Request, res: Response) {
+      let subcategoryRepository = getCustomRepository(PostRepository);
+      await subcategoryRepository.fetchdownloadsPostbyuser(req, res);
+    }
+    
+    static async fetchpostuploaduserprofile(req: Request, res: Response) {
+      let subcategoryRepository = getCustomRepository(PostRepository);
+      await subcategoryRepository.fetchpostuploaduserprofile(req, res);
+    }
     
     static async fetchpostdetail(req: Request, res: Response) {
       let subcategoryRepository = getCustomRepository(PostRepository);
@@ -31,6 +46,10 @@ export class PostController {
     static async isapprovedpost(req: Request, res: Response) {
       let subcategoryRepository = getCustomRepository(PostRepository);
       await subcategoryRepository.isapprovedpost(req, res);
+    }
+    static async fetchFullPostappall(req: Request, res: Response) {
+      let subcategoryRepository = getCustomRepository(PostRepository);
+      await subcategoryRepository.fetchFullPostappall(req, res);
     }
     static async addviewpost(req: Request, res: Response) {
       let subcategoryRepository = getCustomRepository(PostRepository);

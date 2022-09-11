@@ -117,6 +117,105 @@ export class PostRepository extends Repository<PostEntity> {
     }
   }
 
+  async fetchdownloadsPostbyuser(req: Request, res: Response) {
+    let { useremail } = req.params;
+    try {
+      let fullscreenpost = await this.createQueryBuilder("post")
+        .leftJoinAndSelect("post.post_download", "download")
+        .leftJoin("download.downloads_user", "users")
+        .select([
+          "post",
+          "download.download_id"
+        ])
+        .andWhere("users.useremail = :useremail", { useremail })
+        .getMany();
+      if (fullscreenpost !== undefined) {
+        res.send({
+          code: 201,
+          data: fullscreenpost,
+          received: true,
+        });
+      } else {
+        res.send({
+          code: 302,
+          data: null,
+          received: true,
+        });
+      }
+    } catch (error) {
+      if (error) {
+        res.send({
+          code: 402,
+          data: "something went wrong,try again",
+          received: false,
+        });
+      }
+    }
+  }
+
+  async fetchpostuserBookmark(req: Request, res: Response) {
+    try {
+      let { useremail } = req.params;
+
+      var response = await this.createQueryBuilder("post")
+        .leftJoinAndSelect("post.post_bookmark", "bookmark")
+        .leftJoinAndSelect("bookmark.bookmark_user", "users")
+        .leftJoinAndSelect("users.info", "usersinfo")
+        .select([
+          "post",
+          "bookmark.bookmark_id",
+        ])
+        .where("users.useremail = :useremail", { useremail })
+        .getMany();
+      if (response !== undefined) {
+        return res.send({
+          code: 201,
+          data: response,
+        });
+      } else {
+        return res.send({
+          code: 301,
+          data: "no data available",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async fetchpostuploaduserprofile(req: Request, res: Response) {
+    try {
+      let { post_id } = req.params;
+
+      var response = await this.createQueryBuilder("post")
+        .leftJoin("post.upload_user", "users")
+        .leftJoinAndSelect("users.info", "usersinfo")
+        .select([
+          "post",
+          "users.id",
+          "users.useremail",
+          "users.username",
+          "usersinfo.info_id",
+          "usersinfo.profileimage",
+        ])
+        .where("post.post_id = :post_id", { post_id })
+        .getOne();
+      if (response !== undefined) {
+        return res.send({
+          code: 201,
+          data: response,
+        });
+      } else {
+        return res.send({
+          code: 301,
+          data: "no data available",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async fetchPostbycateroyid(req: Request, res: Response) {
     let { parent_category_id } = req.params;
     try {
@@ -314,9 +413,54 @@ export class PostRepository extends Repository<PostEntity> {
     }
   }
 
+   //! approved all posts
+   async fetchFullPostappall(req: Request, res: Response) {
+    let { isapproved } = req.params;
+    try {
+      let fullscreenpost = await this.createQueryBuilder("post")
+        .leftJoinAndSelect("post.upload_user", "users")
+        .leftJoinAndSelect("users.info", "usersinfo")
+        .select([
+          "post",
+          "users.id",
+          "users.useremail",
+          "users.username",
+          "usersinfo.info_id",
+          "usersinfo.profileimage",
+        ])
+        .where("post.post_isapproved = :post_isapproved", {
+          post_isapproved: isapproved,
+        })
+        .getMany();
+      if (fullscreenpost !== undefined) {
+        res.send({
+          code: 201,
+          data: fullscreenpost,
+          message :"data is available",
+          received: true,
+        });
+      } else {
+        res.send({
+          code: 302,
+          data: null,
+          message :"data not found",
+          received: false,
+        });
+      }
+    } catch (error) {
+      if (error) {
+        res.send({
+          code: 402,
+          data: null,
+          message :"something went wrong,try again",
+          received: false,
+        });
+      }
+    }
+  }
+
   async isapprovedpost(req: Request, res: Response) {
     let { post_isapproved, post_id } = req.body;
-
     let admin_token = req.headers.authorization;
     let base_admin_sceret_kry = process.env.ADMIN_SCRECT_PASSWORD;
 

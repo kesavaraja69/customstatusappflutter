@@ -1,4 +1,4 @@
-import { BaseEntity, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UserEntity } from "../../authentication/entity/users.entity";
 import { PostEntity } from "../../posts/entity/post.entity";
 import { FullScreenPostEntity } from "../../post_fullscreen/entity/postfullscreen.entity";
@@ -17,6 +17,7 @@ export class BookmarkEntity extends BaseEntity {
       onUpdate: "CASCADE",
     }
   )
+  @JoinColumn()
   bookmark_post_fs!: FullScreenPostEntity;
 
   //! connection to post entity

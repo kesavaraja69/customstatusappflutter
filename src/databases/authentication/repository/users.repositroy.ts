@@ -1,7 +1,6 @@
 import { BaseEntity, Double, EntityRepository, Repository } from "typeorm";
 import { UserEntity } from "../entity/users.entity";
 import { Request, Response } from "express";
-import { json } from "stream/consumers";
 
 @EntityRepository(UserEntity)
 export class UserRepository extends Repository<UserEntity> {
@@ -34,6 +33,50 @@ export class UserRepository extends Repository<UserEntity> {
           userpassword: hashedpassword,
         })
         .execute();
+    }
+  }
+
+  async submitAdminData(req: Request, res: Response, hashedpassword: string) {
+    let admin_token = req.headers.authorization;
+    let base_admin_sceret_kry = process.env.ADMIN_SCRECT_PASSWORD;
+    let { useremail, username } = req.body;
+
+    if (admin_token === base_admin_sceret_kry) {
+      let isExiting =
+        (await this.createQueryBuilder("users")
+          .select()
+          .where("users.useremail = :useremail", { useremail })
+          .getCount()) > 0;
+
+      if (isExiting) {
+        return res.send({
+          user: null,
+          message: "user is already exsiting",
+          authenticated: false,
+          code: 400,
+        });
+      } else {
+        this.createQueryBuilder("users")
+          .insert()
+          .values({
+            useremail,
+            username,
+            reward_total_amount: "0",
+            reward_All_points: "0",
+            reward_today_points: "0",
+            reward_user_level: "1",
+            is_completed_todaytask: false,
+            userpassword: hashedpassword,
+          })
+          .execute();
+      }
+    } else {
+      return res.send({
+        user: null,
+        message: "your not admin",
+        authenticated: false,
+        code: 503,
+      });
     }
   }
 
@@ -90,14 +133,12 @@ export class UserRepository extends Repository<UserEntity> {
     let { useremail } = req.params;
     let userdata = await this.createQueryBuilder("users")
       .leftJoinAndSelect("users.info", "usersinfo")
-      .leftJoinAndSelect("users.fullscreenvideo", "fullscreenpost")
       .leftJoinAndSelect("users.to_userconnection_data", "connection")
       .select([
         "users.useremail",
         "users.username",
         "users.id",
         "usersinfo",
-        "fullscreenpost",
         "connection",
       ])
       .where("users.useremail = :useremail", { useremail })
@@ -110,6 +151,30 @@ export class UserRepository extends Repository<UserEntity> {
       });
     } else {
       return res.send({
+        data: null,
+        message: "user not found",
+        authenticated: false,
+        code: 407,
+      });
+    }
+  }
+
+  async fetchUserProfileData(req: Request, res: Response) {
+    let { useremail } = req.params;
+    let userdata = await this.createQueryBuilder("users")
+      .leftJoinAndSelect("users.info", "usersinfo")
+      .select(["users.useremail", "users.username", "users.id", "usersinfo"])
+      .where("users.useremail = :useremail", { useremail })
+      .getOne();
+    if (userdata != null) {
+      return res.send({
+        data: userdata,
+        authenticated: true,
+        code: 201,
+      });
+    } else {
+      return res.send({
+        data: null,
         message: "user not found",
         authenticated: false,
         code: 407,
@@ -145,17 +210,52 @@ export class UserRepository extends Repository<UserEntity> {
       .where("users.useremail = :useremail", { useremail })
       .getOne();
 
-    if (baseUser == undefined) {
+    if (baseUser === undefined) {
       res.send({
         user: null,
         message: "account not found",
         authenticated: false,
         code: 402,
       });
+    } else {
+      let baseUserpassword = baseUser!.userpassword;
+      return baseUserpassword;
     }
+  }
 
-    let baseUserpassword = baseUser!.userpassword;
-    return baseUserpassword;
+  async fetchfullscreenuserBookmark(req: Request, res: Response) {
+    try {
+      let { useremail } = req.params;
+
+      var response = await this.createQueryBuilder("users")
+        .leftJoinAndSelect("users.fullscreenvideo", "fullscreenpost")
+        .leftJoinAndSelect("users.user_bookmark", "bookmark")
+        // .leftJoin("bookmark.bookmark_user", "users")
+        .leftJoinAndSelect("users.info", "usersinfo")
+        .select([
+          "fullscreenpost",
+          "users.id",
+          "users.useremail",
+          "users.username",
+          "usersinfo.info_id",
+          "usersinfo.profileimage",
+          "bookmark",
+        ])
+        .getMany();
+      if (response !== undefined) {
+        return res.send({
+          code: 201,
+          data: response,
+        });
+      } else {
+        return res.send({
+          code: 301,
+          data: "no data available",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   //! fetch fullscreenstatus comments
@@ -689,6 +789,43 @@ export class UserRepository extends Repository<UserEntity> {
         submitted: false,
       });
     }
+  }
+
+  //! username update
+  async updateprofilename(req: Request, res: Response) {
+    let { useremail, username } = req.body;
+
+    await this.createQueryBuilder("users")
+      .update(UserEntity)
+      .set({
+        username,
+      })
+      .where("users.useremail = :useremail", { useremail })
+      .execute()
+      .then((data: any) => {
+        var affected = data.affected;
+        if (affected > 0) {
+          return res.send({
+            code: 201,
+            message: "updated Sucessfully",
+            submitted: true,
+          });
+        } else {
+          return res.send({
+            code: 301,
+            message: "not updated",
+            submitted: false,
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        return res.send({
+          code: 401,
+          message: "something went wrong",
+          submitted: false,
+        });
+      });
   }
 
   //! rewards with low and full point

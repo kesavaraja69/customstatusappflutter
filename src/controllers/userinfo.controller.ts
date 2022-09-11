@@ -13,6 +13,11 @@ export class UserInfoController {
     await userinfoRepository.fetchallrewardpointbyuser(req, res);
   }
 
+  static async updateuserProfile(req: Request, res: Response) {
+    let userinfoRepository = getCustomRepository(UserInfoRepository);
+    await userinfoRepository.updateuserProfile(req, res);
+  }
+  
   // static async updateamountpoint(req: Request, res: Response) {
   //   let userinfoRepository = getCustomRepository(UserInfoRepository);
   //   await userinfoRepository.updateamountpoint(req, res);

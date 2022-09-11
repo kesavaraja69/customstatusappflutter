@@ -90,7 +90,6 @@ export class FullScreenPostEntity extends BaseEntity {
     () => BookmarkEntity,
     (post_fs_bookmark) => post_fs_bookmark.bookmark_post_fs
   )
-  @JoinColumn()
   post_fs_bookmark!: BookmarkEntity[];
 
   //! connection to download

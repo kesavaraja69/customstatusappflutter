@@ -61,6 +61,33 @@ export class BookmarkRespositiory extends Repository<BookmarkEntity> {
     }
   }
 
+  async fetchuserBookmark(req: Request, res: Response) {
+    try {
+      let { useremail } = req.params;
+
+      var response = await this.createQueryBuilder("bookmark")
+        .leftJoinAndSelect("bookmark.bookmark_post_fs", "fullscreenpost")
+        .leftJoinAndSelect("bookmark.bookmark_user", "users")
+        .leftJoinAndSelect("users.info", "usersinfo")
+        .select()
+        .where("users.useremail = :useremail", { useremail })
+        .getMany();
+      if (response !== undefined) {
+        return res.send({
+          code: 201,
+          data: response,
+        });
+      } else {
+        return res.send({
+          code: 301,
+          data: "no data available",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async checkuserBookmark(req: Request, res: Response) {
     try {
       let { useremail, fs_post_id } = req.params;
@@ -157,7 +184,6 @@ export class BookmarkRespositiory extends Repository<BookmarkEntity> {
   }
 
   //! post
-
   async addbookmarkpost(req: Request, res: Response) {
     let { useremail, post_id } = req.body;
     var isAlreadyLiked =

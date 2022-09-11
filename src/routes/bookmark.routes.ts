@@ -12,6 +12,10 @@ bookmarkRouter.get(
   "/checkpost/:post_id/:useremail",
   BookmarkController.checkuserBookmarkpost
 );
+bookmarkRouter.get(
+  "/fetchusbookpost/:useremail",
+  BookmarkController.fetchuserBookmark
+);
 bookmarkRouter.get("/fetch/:fs_post_id", BookmarkController.fetchbookmarks);
 bookmarkRouter.get("/fetchpost/:post_id/:useremail", BookmarkController.fetchbookmarkspost);
 //! post

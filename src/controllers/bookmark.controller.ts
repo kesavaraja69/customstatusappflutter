@@ -18,6 +18,13 @@ export class BookmarkController {
     await bookmarkRepository.fetchbookmarks(req, res);
   }
 
+  static async fetchuserBookmark(req: Request, res: Response) {
+    let bookmarkRepository = getCustomRepository(BookmarkRespositiory);
+    await bookmarkRepository.fetchuserBookmark(req, res);
+  }
+
+  
+
   static async removebookmark(req: Request, res: Response) {
     let bookmarkRepository = getCustomRepository(BookmarkRespositiory);
     await bookmarkRepository.removebookmark(req, res);

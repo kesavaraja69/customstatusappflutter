@@ -135,6 +135,58 @@ export class DownloadRepositiory extends Repository<DownloadEntity> {
     }
   }
 
+  async fetchDownloadsbyuser(req: Request, res: Response) {
+    try {
+      let { useremail } = req.params;
+      let response = await this.createQueryBuilder("download")
+        .leftJoinAndSelect("download.downloads_user", "users")
+        .leftJoinAndSelect("download.download_post_fs", "fullscreenpost")
+        .leftJoinAndSelect("users.info", "usersinfo")
+        .select()
+        .where("users.useremail = :useremail", { useremail })
+        .getMany();
+      if (response !== undefined) {
+        return res.send({
+          code: 201,
+          data: response,
+        });
+      } else {
+        return res.send({
+          code: 301,
+          data: "no data available",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async fetchpostDownloadsbyuser(req: Request, res: Response) {
+    try {
+      let { useremail } = req.params;
+      let response = await this.createQueryBuilder("download")
+        .leftJoinAndSelect("download.download_post", "post")
+        .leftJoinAndSelect("download.download_post_fs", "fullscreenpost")
+        .leftJoin("download.downloads_user", "users")
+        .select()
+        .where("users.useremail = :useremail", { useremail })
+        .getMany();
+      if (response !== undefined) {
+        return res.send({
+          code: 201,
+          data: response,
+        });
+      } else {
+        return res.send({
+          code: 301,
+          data: "no data available",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async removedownload(req: Request, res: Response) {
     try {
       let { download_id } = req.params;

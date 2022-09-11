@@ -8,6 +8,6 @@ userinfoRouter.post("/user/addinfo", UserInfoController.submitUserInfo);
 //!get
 userinfoRouter.get("/user/fecthallrewarduser/:useremail", UserInfoController.fetchallrewardpointbyuser);
 //!update
-// userinfoRouter.put("/user/updaterewardamout", UserInfoController.updateamountpoint);
+userinfoRouter.put("/user/updateprofile", UserInfoController.updateuserProfile);
 
 export { userinfoRouter };

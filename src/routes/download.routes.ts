@@ -17,6 +17,17 @@ downloadRouter.get(
   "/checkdownloadpost/:useremail/:post_id",
   DownloadController.checkuserDownloadpost
 );
+downloadRouter.get(
+  "/fetchdownloadedfullScreenpost/:useremail",
+  DownloadController.fetchDownloadsbyuser
+);
+
+downloadRouter.get(
+  "/fetchdownloadedposts/:useremail",
+  DownloadController.fetchpostDownloadsbyuser
+);
+
+
 
 //!post
 downloadRouter.post("/add", DownloadController.addDownload);
