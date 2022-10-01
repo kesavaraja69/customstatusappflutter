@@ -8,5 +8,7 @@ contactusRouter.post("/addcontactusandreport", ContactusContoller.adduserreporta
 
 //! get
 contactusRouter.get("/fetchcontactusandreport", ContactusContoller.fetchuserreportandcontactus)
+contactusRouter.get("/fetchcontactusorreport", ContactusContoller.fetchuserreportorcontactus)
+
 
 export { contactusRouter };

@@ -12,5 +12,9 @@ export class ContactusContoller {
         let contactusrep = getCustomRepository(ContactusRepository);
         await contactusrep.fetchuserreportandcontactus(req, res);
     }
+    static async fetchuserreportorcontactus(req: Request, res: Response) {
+        let contactusrep = getCustomRepository(ContactusRepository);
+        await contactusrep.fetchuserreportorcontactus(req, res);
+    }
     
 }

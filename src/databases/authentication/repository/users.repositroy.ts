@@ -250,7 +250,7 @@ export class UserRepository extends Repository<UserEntity> {
       } else {
         return res.send({
           code: 301,
-          data: "no data available",
+          data: null,
         });
       }
     } catch (error) {
@@ -356,7 +356,7 @@ export class UserRepository extends Repository<UserEntity> {
         } else {
           res.send({
             code: 304,
-            data: post,
+            data: null,
             message: "not Fetched",
             received: true,
           });
@@ -364,7 +364,7 @@ export class UserRepository extends Repository<UserEntity> {
       } else {
         res.send({
           code: 403,
-          data: post,
+          data: null,
           message: "user not found",
           received: true,
         });
@@ -404,7 +404,7 @@ export class UserRepository extends Repository<UserEntity> {
         } else {
           res.send({
             code: 304,
-            data: post,
+            data: null,
             message: "not Fetched",
             received: true,
           });
@@ -412,7 +412,7 @@ export class UserRepository extends Repository<UserEntity> {
       } else {
         res.send({
           code: 403,
-          data: post,
+          data: null,
           message: "user not found",
           received: true,
         });
@@ -468,29 +468,29 @@ export class UserRepository extends Repository<UserEntity> {
                 switch (post_type) {
                   case "fullscreenpost":
                     if (dataam == "0") {
-                      fnusamount = 1.7;
-                      usertodayamount = 1.7;
+                      fnusamount = 1.4;
+                      usertodayamount = 1.4;
                     } else {
-                      fnusamount = 1.7 + parseFloat(dataam);
-                      usertodayamount = 1.7;
+                      fnusamount = 1.4 + parseFloat(dataam);
+                      usertodayamount = 1.4;
                     }
                     break;
                   case "normalvideopost":
                     if (dataam == "0") {
-                      fnusamount = 1.2;
-                      usertodayamount = 1.2;
+                      fnusamount = 1;
+                      usertodayamount = 1;
                     } else {
-                      fnusamount = 1.2 + parseFloat(dataam);
-                      usertodayamount = 1.2;
+                      fnusamount = 1 + parseFloat(dataam);
+                      usertodayamount = 1;
                     }
                     break;
                   case "youtubepost":
                     if (dataam == "0") {
-                      fnusamount = 2;
-                      usertodayamount = 2;
+                      fnusamount = 1.6;
+                      usertodayamount = 1.6;
                     } else {
-                      fnusamount = 2 + parseFloat(dataam);
-                      usertodayamount = 2;
+                      fnusamount = 1.6 + parseFloat(dataam);
+                      usertodayamount = 1.6;
                     }
                     break;
                   case "normalimagepost":
@@ -513,29 +513,29 @@ export class UserRepository extends Repository<UserEntity> {
             switch (post_type) {
               case "fullscreenpost":
                 if (data1[1] == "0") {
-                  data2 = 17;
-                  usertodaypoint = 17;
+                  data2 = 14;
+                  usertodaypoint = 14;
                 } else {
-                  data2 = parseInt(data1[1]) + 17;
-                  usertodaypoint = 17;
+                  data2 = parseInt(data1[1]) + 14;
+                  usertodaypoint = 14;
                 }
                 break;
               case "normalvideopost":
                 if (data1[1] == "0") {
-                  data2 = 12;
-                  usertodaypoint = 12;
+                  data2 = 10;
+                  usertodaypoint = 10;
                 } else {
-                  data2 = 12 + parseInt(data1[1]);
-                  usertodaypoint = 12;
+                  data2 = 10 + parseInt(data1[1]);
+                  usertodaypoint = 10;
                 }
                 break;
               case "youtubepost":
                 if (data1[1] == "0") {
-                  data2 = 20;
-                  usertodaypoint = 20;
+                  data2 = 16;
+                  usertodaypoint = 16;
                 } else {
-                  data2 = parseInt(data1[1]) + 20;
-                  usertodaypoint = 20;
+                  data2 = parseInt(data1[1]) + 16;
+                  usertodaypoint = 16;
                 }
                 break;
               case "normalimagepost":
@@ -866,11 +866,11 @@ export class UserRepository extends Repository<UserEntity> {
                 switch (post_type) {
                   case "fullscreenpost":
                     if (dataam == "0") {
-                      fnusamount = 1.7;
-                      usertodayamount = 1.7;
+                      fnusamount = 1.4;
+                      usertodayamount = 1.4;
                     } else {
-                      fnusamount = 1.7 + parseFloat(dataam);
-                      usertodayamount = 1.7;
+                      fnusamount = 1.4 + parseFloat(dataam);
+                      usertodayamount = 1.4;
                     }
                     break;
                   case "normalvideopost":
@@ -884,11 +884,11 @@ export class UserRepository extends Repository<UserEntity> {
                     break;
                   case "youtubepost":
                     if (dataam == "0") {
-                      fnusamount = 2;
-                      usertodayamount = 2;
+                      fnusamount = 1.6;
+                      usertodayamount = 1.6;
                     } else {
-                      fnusamount = 2 + parseFloat(dataam);
-                      usertodayamount = 2;
+                      fnusamount = 1.6 + parseFloat(dataam);
+                      usertodayamount = 1.6;
                     }
                     break;
                   case "normalimagepost":
@@ -912,14 +912,14 @@ export class UserRepository extends Repository<UserEntity> {
               case "fullscreenpost":
                 if (data1[1] == "0") {
                   if (adloaded == true) {
-                    data2 = 17;
-                    usertodaypoint = 17;
+                    data2 = 14;
+                    usertodaypoint = 14;
                   } else {
                     data2 = 3;
                   }
                 } else if (adloaded == true) {
-                  data2 = parseInt(data1[1]) + 17;
-                  usertodaypoint = 17;
+                  data2 = parseInt(data1[1]) + 14;
+                  usertodaypoint = 14;
                 } else {
                   data2 = parseInt(data1[1]) + 3;
                 }
@@ -942,14 +942,14 @@ export class UserRepository extends Repository<UserEntity> {
               case "youtubepost":
                 if (data1[1] == "0") {
                   if (adloaded == true) {
-                    data2 = 20;
-                    usertodaypoint = 20;
+                    data2 = 16;
+                    usertodaypoint = 16;
                   } else {
                     data2 = parseInt(data1[1]) + 4;
                   }
                 } else if (adloaded == true) {
-                  data2 = parseInt(data1[1]) + 20;
-                  usertodaypoint = 20;
+                  data2 = parseInt(data1[1]) + 16;
+                  usertodaypoint = 16;
                 } else {
                   data2 = parseInt(data1[1]) + 4;
                 }
