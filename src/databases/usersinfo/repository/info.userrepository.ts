@@ -81,7 +81,7 @@ export class UserInfoRepository extends Repository<UserInfoEntity> {
   }
 
   async updateuserProfile(req: Request, res: Response) {
-    let { useremail, aboutyourself, profileimage, info_id } = req.body;
+    let { useremail, aboutyourself, profileimage, info_id, } = req.body;
     try {
       let userRepository = getCustomRepository(UserRepository);
       let user = await userRepository.findOne({ useremail });
