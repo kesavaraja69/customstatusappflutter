@@ -52,28 +52,46 @@ export class AuthenticationControllers {
       });
     }
 
-    let salt = await bycrypt.genSalt(10);
+    let isExiting =
+      (await getCustomRepository(UserRepository)
+        .createQueryBuilder("users")
+        .select()
+        .where("users.useremail = :useremail", { useremail })
+        .getCount()) > 0;
 
-    bycrypt.hash(
-      userpassword,
-      salt,
-      async (error: any, hashedpassword: any) => {
-        if (error) {
-          return res.send({
-            user: null,
-            message: "something went wrong",
-            authenticated: false,
-            code: 403,
-          });
+    if (isExiting) {
+      return res.send({
+        user: null,
+        message: "user is already exsiting",
+        authenticated: false,
+        code: 400,
+      });
+    } else{
+      let salt = await bycrypt.genSalt(10);
+
+      bycrypt.hash(
+        userpassword,
+        salt,
+        async (error: any, hashedpassword: any) => {
+          if (error) {
+            return res.send({
+              user: null,
+              message: "something went wrong",
+              authenticated: false,
+              code: 403,
+            });
+          }
+          console.log(hashedpassword);
+  
+          let userRepository = getCustomRepository(UserRepository);
+          await userRepository.submitUserData(req, res, hashedpassword);
+          await AuthenticationControllers.createJWt(useremail, res);
         }
-        console.log(hashedpassword);
-
-        let userRepository = getCustomRepository(UserRepository);
-        await userRepository.submitUserData(req, res, hashedpassword);
-        await AuthenticationControllers.createJWt(useremail, res);
-      }
-    );
+      );
+    }
+  
   }
+
 
   static async createAdminAccount(req: Request, res: Response) {
     let { useremail, userpassword } = req.body;

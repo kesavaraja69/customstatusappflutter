@@ -22,4 +22,8 @@ fullscreenpostRouter.post("/addfullscreenvideo/:category_id", FullScreenVideoCon
 fullscreenpostRouter.post("/addfullscreenvideoview", FullScreenVideoController.addviewfullscreenpost);
 //! update
 fullscreenpostRouter.put("/fullscreenvideoapprovel", FullScreenVideoController.isapprovedfullscreenpost);
+//! patch
+fullscreenpostRouter.patch("/addimagelocal/:filetype", FullScreenVideoController.imagekitioupload);
+
+
 export { fullscreenpostRouter };

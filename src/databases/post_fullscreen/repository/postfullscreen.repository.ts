@@ -2,9 +2,14 @@ import { EntityRepository, getCustomRepository, Repository } from "typeorm";
 import { Request, Response } from "express";
 import dotenv from "dotenv";
 import { FullScreenPostEntity } from "../entity/postfullscreen.entity";
-import { SubCategoryRepository } from "../../subcategory/repository/subcategory.repository";
 import { UserRepository } from "../../authentication/repository/users.repositroy";
 import { CategoryRepository } from "../../categorys/repositroy/category.repositroy";
+import ImageKit from "imagekit";
+
+import fs from "fs";
+import multer from "multer";
+import { MyArrayslist, Root } from "../../../models/imagesdt";
+
 dotenv.config();
 @EntityRepository(FullScreenPostEntity)
 export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
@@ -169,11 +174,315 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
     }
   }
 
+  async imagekitioupload(req: Request, res: Response) {
+    let { filetype } = req.params;
+    let myArrays: Array<any> = [];
+
+    let myArrayslist: Array<any> = [];
+
+    let storage;
+    var imagekit = new ImageKit({
+      publicKey: "public_QGV75szcjUrF3X3hQJs0tJvDt7U=",
+      privateKey: "private_lZW2yXVxaUU8fmbrtDChBN9jB0I=",
+      urlEndpoint: "https://ik.imagekit.io/mqplbpi4l",
+    });
+
+    try {
+      // //  const upload = multer({ storage: storage })
+
+      storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+          cb(null, "./imageupload");
+        },
+        filename: function (req, file, cb) {
+          cb(null, "techking.jpg");
+        },
+      });
+
+      switch (filetype) {
+        case "fullscreenpost":
+          storage = multer.diskStorage({
+            destination: function (req, file, cb) {
+              cb(null, "./imageupload");
+            },
+            filename: function (req, file, cb) {
+              cb(null, "techking.jpg");
+            },
+          });
+          break;
+        case "fullscreenpostvideo":
+          storage = multer.diskStorage({
+            destination: function (req, file, cb) {
+              cb(null, "./imageupload");
+            },
+            filename: function (req, file, cb) {
+              cb(null, "techkingfvvd.mp4");
+            },
+          });
+          break;
+        case "normalvideopost":
+          storage = multer.diskStorage({
+            destination: function (req, file, cb) {
+              cb(null, "./imageupload");
+            },
+            filename: function (req, file, cb) {
+              cb(null, "techkingvd.mp4");
+            },
+          });
+          break;
+        case "normalimagepost":
+          storage = multer.diskStorage({
+            destination: function (req, file, cb) {
+              cb(null, "./imageupload/images");
+            },
+            filename: function (req, file, cb) {
+              cb(null, "techkingvd.jpg");
+
+              console.log(`file path ${file.path}`);
+              //  myArrayslist.push(file.path);
+            },
+          });
+          break;
+      }
+
+      if (filetype == "normalimagepost") {
+        let upload = multer({ storage: storage }).array("images", 3);
+        upload(req, res, async (err) => {
+          if (err) {
+            res.send({
+              message: "not uploaded",
+              data: null,
+              code: 302,
+            });
+          }
+
+          // console.log(`file path ${req.files}`);
+
+          myArrayslist.push(req.files);
+
+          // res.send({
+          //   message: "uplaod sucessfully",
+          //   data: req.files,
+          //   code: 201,
+          // });
+
+          //   const JSobj = JSON.parse();
+
+          // console.log(JSobj);
+          // console.log(typeof JSobj);
+
+          const JSON_string = JSON.stringify({ myArrayslist });
+
+          //  console.log(JSON_string);
+
+          let JSobj: Root = JSON.parse(JSON_string);
+
+          // console.log(JSobj.myArrayslist[0][0].path);
+
+          // res.send({
+          //   message: "uplaod sucessfully",
+          //   data: req.files,
+          //   code: 201,
+          // });
+
+          // for (let i = 0; i < JSobj.myArrayslist[0].length; i++) {
+          //   // console.log("Block statement execution no." + i);
+
+          // }
+
+          if (JSobj.myArrayslist[0] !== undefined) {
+            JSobj.myArrayslist[0].forEach(async (element, index, arrays) => {
+              var data = JSobj.myArrayslist[0][index].path;
+
+              console.log("final path is " + data);
+
+              fs.readFile(
+                JSobj.myArrayslist[0][index].path,
+                function (err, data) {
+                  if (err) throw err; // Fail if the file can't be read.
+                  imagekit.upload(
+                    {
+                      file: data, //required
+                      fileName: `${JSobj.myArrayslist[0][index].filename}`, //required
+                    },
+                    function (error, result) {
+                      if (error) {
+                        res.send({
+                          code: 306,
+                          message: "file not upload",
+                          datavl: null,
+                        });
+                        console.log(`aws err ${err}`);
+                      } else {
+                        myArrays.push(result?.url);
+                        if (index === arrays.length - 1) {
+                          if (result?.url != null) {
+                            res.send({
+                              code: 201,
+                              data: req.files?.length,
+                              imagedata: myArrays,
+                              recivied: true,
+                            });
+                            //   console.log("loop is closed");
+                          }
+                        }
+                      }
+
+                      // console.log(`aws array ${myArrays}`);
+                    }
+                  );
+                }
+              );
+            });
+          }
+        });
+      } else {
+        const upload = multer({ storage: storage }).single("image");
+        upload(req, res, (err) => {
+          if (err) {
+            res.send({
+              message: "not uploaded",
+              data: null,
+              code: 302,
+            });
+          }
+          console.log(`file path ${req.file?.path}`);
+
+          fs.readFile(`${req.file?.path}`, function (err, data) {
+            if (err) throw err; // Fail if the file can't be read.
+            imagekit.upload(
+              {
+                file: data, //required
+                fileName: `${req.file?.filename}`, //required
+              },
+              function (error, result) {
+                if (error) {
+                  res.send({
+                    message: "not uploaded",
+                    data: null,
+                    code: 301,
+                  });
+                }
+                //  console.log(req.file);
+                res.send({
+                  message: "uplaod sucessfully",
+                  data: result?.url,
+                  code: 201,
+                });
+              }
+            );
+          });
+        });
+      }
+    } catch (error) {
+      res.send({
+        message: error,
+      });
+    }
+  }
+
   //! fetch fullscreenpost with limit
   async fetchFullScreenPostwithlimit(req: Request, res: Response) {
     let { count } = req.params;
     const dataindex: any = count;
+    // const myArrays: Array<string> = [];
+
+    // let imgaeurl: any;
+    // let s3config = new AWS.S3({
+    //   accessKeyId: "AKIAYVNHSGTZMT64AQEG",
+    //   secretAccessKey: "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",
+    //   region: "us-east-1",
+    // });
     try {
+      // if (dtatesdf !== undefined) {
+      //   res.send({
+      //     code: 201,
+      //     data: dtatesdf,
+      //     recivied: true,
+      //   });
+      // } else {
+      //   res.send({
+      //     code: 302,
+      //     data: null,
+      //     recivied: false,
+      //   });
+      // }
+
+      // let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
+      //   .leftJoinAndSelect("fullscreenpost.upload_user", "users")
+      //   .leftJoinAndSelect("users.info", "usersinfo")
+      //   .take(dataindex)
+      //   .select([
+      //     "fullscreenpost",
+      //     "users.id",
+      //     "users.useremail",
+      //     "users.username",
+      //     "usersinfo.info_id",
+      //     "usersinfo.profileimage",
+      //   ])
+      //   .getMany();
+      // // function delay(ms: number) {
+      // //   return new Promise((resolve) => setTimeout(resolve, ms));
+      // // }
+
+      // if (fullscreenpost !== undefined) {
+      //   fullscreenpost.forEach(async (element, index, arrays) => {
+      //     if (index != arrays.length) {
+      //       s3config.getSignedUrl(
+      //         "getObject",
+      //         {
+      //           Bucket:
+      //             "demoawstestd2be3738946046f990b6e9e4bb74d34b82954-staging",
+      //           Key: element.fs_post_imageurl,
+      //           Expires: 43200,
+      //         },
+      //         (err, data) => {
+      //           if (err) {
+      //             res.send({
+      //               code: 306,
+      //               message: "aws not fecth",
+      //               datavl: null,
+      //             });
+      //             console.log(`aws err ${err}`);
+      //           } else {
+      //             imgaeurl = element.fs_post_imageurl;
+      //             console.log(`image url is ${imgaeurl}`);
+
+      //             //  console.log(`aws url ${data}`);
+      //             myArrays.push(data);
+      //           }
+      //           console.log(`aws array ${myArrays}`);
+      //           if (index === arrays.length - 1) {
+      //             console.log("loop is closed");
+
+      //             if (index === arrays.length - 1) {
+      //               res.send({
+      //                 code: 201,
+      //                 data: fullscreenpost,
+      //                 imagedata: myArrays,
+      //                 recivied: true,
+      //               });
+      //             }
+      //           }
+      //         }
+      //       );
+      //     }
+      //   });
+
+      //   // res.send({
+      //   //   code: 201,
+      //   //   data: fullscreenpost,
+      //   //   imagedata: myArrays.length,
+      //   //   recivied: true,
+      //   // });
+      // } else {
+      //   res.send({
+      //     code: 302,
+      //     data: null,
+      //     recivied: false,
+      //   });
+      // }
+
       let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
         .leftJoinAndSelect("fullscreenpost.upload_user", "users")
         .leftJoinAndSelect("users.info", "usersinfo")
@@ -270,14 +579,14 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
         res.send({
           code: 201,
           data: fullscreenpost,
-          message :"data is available",
+          message: "data is available",
           received: true,
         });
       } else {
         res.send({
           code: 302,
           data: null,
-          message :"data not found",
+          message: "data not found",
           received: false,
         });
       }
@@ -286,7 +595,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
         res.send({
           code: 402,
           data: null,
-          message :"something went wrong,try again",
+          message: "something went wrong,try again",
           received: false,
         });
       }
