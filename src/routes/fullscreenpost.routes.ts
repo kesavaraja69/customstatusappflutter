@@ -25,5 +25,7 @@ fullscreenpostRouter.put("/fullscreenvideoapprovel", FullScreenVideoController.i
 //! patch
 fullscreenpostRouter.patch("/addimagelocal/:filetype", FullScreenVideoController.imagekitioupload);
 
+fullscreenpostRouter.patch("/addimageslocal/:filetype/:imagno", FullScreenVideoController.imagekitioupload);
+
 
 export { fullscreenpostRouter };

@@ -175,7 +175,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
   }
 
   async imagekitioupload(req: Request, res: Response) {
-    let { filetype } = req.params;
+    let { filetype,imagno } = req.params;
     let myArrays: Array<any> = [];
 
     let myArrayslist: Array<any> = [];
@@ -236,9 +236,9 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
               cb(null, "./imageupload/images");
             },
             filename: function (req, file, cb) {
-              cb(null, "techkingvd.jpg");
+              cb(null, file.originalname);
 
-              console.log(`file path ${file.path}`);
+              console.log(`file path ${file.originalname}`);
               //  myArrayslist.push(file.path);
             },
           });
@@ -246,17 +246,17 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       }
 
       if (filetype == "normalimagepost") {
-        let upload = multer({ storage: storage }).array("images", 3);
+        let upload = multer({ storage: storage }).array("images",3);
         upload(req, res, async (err) => {
           if (err) {
             res.send({
               message: "not uploaded",
               data: null,
-              code: 302,
+              code: 305,
             });
           }
 
-          // console.log(`file path ${req.files}`);
+           console.log(`file path ${req.files}`);
 
           myArrayslist.push(req.files);
 
@@ -273,7 +273,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
 
           const JSON_string = JSON.stringify({ myArrayslist });
 
-          //  console.log(JSON_string);
+            console.log(JSON_string);
 
           let JSobj: Root = JSON.parse(JSON_string);
 
@@ -310,7 +310,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
                         res.send({
                           code: 306,
                           message: "file not upload",
-                          datavl: null,
+                          data: null,
                         });
                         console.log(`aws err ${err}`);
                       } else {
@@ -319,8 +319,9 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
                           if (result?.url != null) {
                             res.send({
                               code: 201,
-                              data: req.files?.length,
-                              imagedata: myArrays,
+                              message: "file uploaded",
+                              imagedatalength: req.files?.length,
+                              data: myArrays,
                               recivied: true,
                             });
                             //   console.log("loop is closed");
@@ -333,6 +334,12 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
                   );
                 }
               );
+            });
+          } else {
+            res.send({
+              message: "not uploaded",
+              data: null,
+              code: 303,
             });
           }
         });
@@ -376,7 +383,9 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       }
     } catch (error) {
       res.send({
-        message: error,
+        message: "not uploaded",
+        data: null,
+        code: 403,
       });
     }
   }
