@@ -866,38 +866,74 @@ export class UserRepository extends Repository<UserEntity> {
                 switch (post_type) {
                   case "fullscreenpost":
                     if (dataam == "0") {
-                      fnusamount = 0.7;
-                      usertodayamount = 0.7;
+                      if (adloaded == true) {
+                        fnusamount = 0.7;
+                        usertodayamount = 0.7;
+                      } else {
+                        fnusamount = 0.15;
+                        usertodayamount = 0.15;
+                      }
                     } else {
-                      fnusamount = 0.7 + parseFloat(dataam);
-                      usertodayamount = 0.7;
+                      if (adloaded == true) {
+                        fnusamount = 0.7 + parseFloat(dataam);
+                        usertodayamount = 0.7;
+                      }
+                      fnusamount = 0.15 + parseFloat(dataam);
+                      usertodayamount = 0.15;
                     }
                     break;
                   case "normalvideopost":
                     if (dataam == "0") {
-                      fnusamount = 0.6;
-                      usertodayamount = 0.6;
+                      if (adloaded == true) {
+                        fnusamount = 0.6;
+                        usertodayamount = 0.6;
+                      } else {
+                        fnusamount = 0.15;
+                        usertodayamount = 0.15;
+                      }
                     } else {
-                      fnusamount = 0.6 + parseFloat(dataam);
-                      usertodayamount = 0.6;
+                      if (adloaded == true) {
+                        fnusamount = 0.6 + parseFloat(dataam);
+                        usertodayamount = 0.6;
+                      }
+                      fnusamount = 0.15 + parseFloat(dataam);
+                      usertodayamount = 0.15;
                     }
                     break;
                   case "youtubepost":
                     if (dataam == "0") {
-                      fnusamount = 0.8;
-                      usertodayamount = 0.8;
+                      if (adloaded == true) {
+                        fnusamount = 0.8;
+                        usertodayamount = 0.8;
+                      } else {
+                        fnusamount = 0.2;
+                        usertodayamount = 0.2;
+                      }
                     } else {
-                      fnusamount = 0.8 + parseFloat(dataam);
-                      usertodayamount = 0.8;
+                      if (adloaded == true) {
+                        fnusamount = 0.8 + parseFloat(dataam);
+                        usertodayamount = 0.8;
+                      }
+                      fnusamount = 0.2 + parseFloat(dataam);
+                      usertodayamount = 0.2;
                     }
                     break;
                   case "normalimagepost":
                     if (dataam == "0") {
-                      fnusamount = 0.5;
-                      usertodayamount = 0.5;
+                      if (adloaded == true) {
+                        fnusamount = 0.5;
+                        usertodayamount = 0.5;
+                      } else {
+                        fnusamount = 0.12;
+                        usertodayamount = 0.12;
+                      }
                     } else {
-                      fnusamount = 0.5 + parseFloat(dataam);
-                      usertodayamount = 0.5;
+                      if (adloaded == true) {
+                        fnusamount = 0.5 + parseFloat(dataam);
+                        usertodayamount = 0.5;
+                      }
+                      fnusamount = 0.12 + parseFloat(dataam);
+                      usertodayamount = 0.12;
                     }
                     break;
                   default:
