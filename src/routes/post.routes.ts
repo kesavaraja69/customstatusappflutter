@@ -18,7 +18,8 @@ postRouter.get("/fetchcommentpost/:post_id", PostController.fetchCommentpost);
 //!post
 postRouter.post("/addpost/:category_id", PostController.submitPost);
 
-postRouter.post("/addviewpost", PostController.addviewpost);
+
 //! update
 postRouter.put("/approveduserpost", PostController.isapprovedpost);
+postRouter.put("/addviewpost", PostController.addviewpost);
 export { postRouter };

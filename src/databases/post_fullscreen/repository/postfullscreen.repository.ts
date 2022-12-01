@@ -177,7 +177,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
   async imagekitioupload(req: Request, res: Response) {
     let { filetype, imagno } = req.params;
     let myArrays: Array<any> = [];
-   // const sleep = (4000) => new Promise(r => setTimeout(r, ms));
+    // const sleep = (4000) => new Promise(r => setTimeout(r, ms));
     let myArrayslist: Array<any> = [];
 
     let storage;
@@ -190,14 +190,14 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
     try {
       // //  const upload = multer({ storage: storage })
 
-      storage = multer.diskStorage({
-        destination: function (req, file, cb) {
-          cb(null, "./imageupload");
-        },
-        filename: function (req, file, cb) {
-          cb(null, "techking.jpg");
-        },
-      });
+      // storage = multer.diskStorage({
+      //   destination: function (req, file, cb) {
+      //     cb(null, "./imageupload");
+      //   },
+      //   filename: function (req, file, cb) {
+      //     cb(null, "techking.jpg");
+      //   },
+      // });
 
       switch (filetype) {
         case "fullscreenpost":
@@ -246,7 +246,10 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       }
 
       if (filetype == "normalimagepost") {
-        let upload = multer({ storage: storage }).array("images", 3);
+        let upload = multer({ storage: storage }).array(
+          "images",
+          Number(imagno)
+        );
         upload(req, res, async (err) => {
           if (err) {
             res.send({
@@ -290,8 +293,6 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
 
           // }
 
-          
-
           if (JSobj.myArrayslist[0] !== undefined) {
             JSobj.myArrayslist[0].forEach(async (element, index, arrays) => {
               var data = JSobj.myArrayslist[0][index].path;
@@ -319,7 +320,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
                         myArrays.push(result?.url);
                         if (index === arrays.length - 1) {
                           if (result?.url != null) {
-                            await new Promise(f => setTimeout(f, 2000));
+                            await new Promise((f) => setTimeout(f, 2000));
                             res.send({
                               code: 201,
                               message: "file uploaded",
@@ -327,18 +328,16 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
                               data: myArrays,
                               recivied: true,
                             });
-                          //  await sleep();
+                            //  await sleep();
                             //   console.log("loop is closed");
-                            await new Promise(f => setTimeout(f, 1000));
+                            await new Promise((f) => setTimeout(f, 1000));
                             fs.rmSync("./imageupload/images", {
                               recursive: true,
-                              
                             });
-                            await new Promise(f => setTimeout(f, 1000));
+                            await new Promise((f) => setTimeout(f, 1000));
                             console.log("done");
                             fs.access("./imageupload/images", (error) => {
-   
-                              // To check if the given directory 
+                              // To check if the given directory
                               // already exists or not
                               if (error) {
                                 // If current directory does not exist
@@ -347,11 +346,15 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
                                   if (error) {
                                     console.log(error);
                                   } else {
-                                    console.log("New Directory created successfully !!");
+                                    console.log(
+                                      "New Directory created successfully !!"
+                                    );
                                   }
                                 });
                               } else {
-                                console.log("Given Directory already exists !!");
+                                console.log(
+                                  "Given Directory already exists !!"
+                                );
                               }
                             });
                           }

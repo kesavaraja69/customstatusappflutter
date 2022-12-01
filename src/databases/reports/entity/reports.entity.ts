@@ -32,7 +32,5 @@ export class ReportsEntity extends BaseEntity {
     report_message!: string;
     
     @ManyToOne(()=>UserEntity,(log_user)=>log_user.reports)
-    log_user!:UserEntity;
-
-    
+    log_user!:UserEntity;  
 }
