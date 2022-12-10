@@ -94,6 +94,7 @@ export class PostRepository extends Repository<PostEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
         ])
         .getMany();
 
@@ -197,6 +198,7 @@ export class PostRepository extends Repository<PostEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
         ])
         .where("post.post_id = :post_id", { post_id })
         .getOne();
@@ -230,6 +232,7 @@ export class PostRepository extends Repository<PostEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
         ])
         .andWhere("category.category_id = :parent_category_id", {
           parent_category_id,
@@ -269,6 +272,7 @@ export class PostRepository extends Repository<PostEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
         ])
         .orderBy("RANDOM()")
         .limit(4)
@@ -307,6 +311,7 @@ export class PostRepository extends Repository<PostEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
         ])
         .where("post.post_id = :post_id", { post_id })
         .getOne();
@@ -345,6 +350,7 @@ export class PostRepository extends Repository<PostEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
         ])
         .where("users.useremail = :useremail", { useremail })
         .getMany();
@@ -385,6 +391,7 @@ export class PostRepository extends Repository<PostEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
         ])
         .where("post.post_id = :post_id", { post_id })
         .getMany();
@@ -427,6 +434,7 @@ export class PostRepository extends Repository<PostEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
         ])
         .where("post.post_isapproved = :post_isapproved", {
           post_isapproved: isapproved,

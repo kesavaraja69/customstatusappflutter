@@ -14,6 +14,11 @@ export class UserInfoEntity extends BaseEntity {
   @Column({
     nullable: true,
   })
+  customimage!: string;
+
+  @Column({
+    nullable: true,
+  })
   profileimage!: string;
 
   @OneToOne(()=> UserEntity,(user)=>user.info)

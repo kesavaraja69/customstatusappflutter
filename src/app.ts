@@ -19,6 +19,7 @@ import { viewsRouter } from "./routes/views.routes";
 import { rewardRouter } from "./routes/reward.routes";
 import { amountRouter } from "./routes/amount.routes";
 import { contactusRouter } from "./routes/contactus.routes";
+import path from "path";
 
 createConnection(config as ConnectionOptions).then(async (connection) => {
   if (connection.isConnected) {
@@ -48,6 +49,7 @@ createConnection(config as ConnectionOptions).then(async (connection) => {
   app.use("/api/reward",rewardRouter);
   app.use("/api/userpayment",amountRouter);
   app.use("/api/contactusandreport",contactusRouter);
+  app.use("/api/",express.static('imageupload'));
 
   app.set("port", port);
   app.listen(app.get("port"), () => {

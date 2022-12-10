@@ -239,6 +239,7 @@ export class UserRepository extends Repository<UserEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
           "bookmark",
         ])
         .getMany();

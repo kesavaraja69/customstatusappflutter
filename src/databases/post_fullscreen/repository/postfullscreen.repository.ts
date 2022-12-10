@@ -153,6 +153,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
         ])
         .andWhere("fullscreenpost.fs_post_id = :fs_post_id", {
           fs_post_id,
@@ -203,30 +204,40 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
         case "fullscreenpost":
           storage = multer.diskStorage({
             destination: function (req, file, cb) {
-              cb(null, "./imageupload");
+              cb(null, "./imageupload/fullscreenpostimage");
             },
             filename: function (req, file, cb) {
-              cb(null, "techking.jpg");
+              cb(null, file.originalname);
             },
           });
           break;
+          case "profilepic":
+            storage = multer.diskStorage({
+              destination: function (req, file, cb) {
+                cb(null, "./imageupload/profilepic");
+              },
+              filename: function (req, file, cb) {
+                cb(null, file.originalname);
+              },
+            });
+            break;  
         case "fullscreenpostvideo":
           storage = multer.diskStorage({
             destination: function (req, file, cb) {
-              cb(null, "./imageupload");
+              cb(null, "./imageupload/fullscreenpostvideo");
             },
             filename: function (req, file, cb) {
-              cb(null, "techkingfvvd.mp4");
+              cb(null, file.originalname);
             },
           });
           break;
         case "normalvideopost":
           storage = multer.diskStorage({
             destination: function (req, file, cb) {
-              cb(null, "./imageupload");
+              cb(null, "./imageupload/normalvideopost");
             },
             filename: function (req, file, cb) {
-              cb(null, "techkingvd.mp4");
+              cb(null, file.originalname);
             },
           });
           break;
@@ -237,7 +248,6 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
             },
             filename: function (req, file, cb) {
               cb(null, file.originalname);
-
               console.log(`file path ${file.originalname}`);
               //  myArrayslist.push(file.path);
             },
@@ -258,11 +268,8 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
               code: 305,
             });
           }
-
           console.log(`file path ${req.files}`);
-
           myArrayslist.push(req.files);
-
           // res.send({
           //   message: "uplaod sucessfully",
           //   data: req.files,
@@ -302,68 +309,90 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
               fs.readFile(
                 JSobj.myArrayslist[0][index].path,
                 function (err, data) {
-                  if (err) throw err; // Fail if the file can't be read.
-                  imagekit.upload(
-                    {
-                      file: data, //required
-                      fileName: `${JSobj.myArrayslist[0][index].filename}`, //required
-                    },
-                    async function (error, result) {
-                      if (error) {
-                        res.send({
-                          code: 306,
-                          message: "file not upload",
-                          data: null,
-                        });
-                        console.log(`aws err ${err}`);
-                      } else {
-                        myArrays.push(result?.url);
-                        if (index === arrays.length - 1) {
-                          if (result?.url != null) {
-                            await new Promise((f) => setTimeout(f, 2000));
-                            res.send({
-                              code: 201,
-                              message: "file uploaded",
-                              imagedatalength: req.files?.length,
-                              data: myArrays,
-                              recivied: true,
-                            });
-                            //  await sleep();
-                            //   console.log("loop is closed");
-                            await new Promise((f) => setTimeout(f, 1000));
-                            fs.rmSync("./imageupload/images", {
-                              recursive: true,
-                            });
-                            await new Promise((f) => setTimeout(f, 1000));
-                            console.log("done");
-                            fs.access("./imageupload/images", (error) => {
-                              // To check if the given directory
-                              // already exists or not
-                              if (error) {
-                                // If current directory does not exist
-                                // then create it
-                                fs.mkdir("./imageupload/images", (error) => {
-                                  if (error) {
-                                    console.log(error);
-                                  } else {
-                                    console.log(
-                                      "New Directory created successfully !!"
-                                    );
-                                  }
-                                });
-                              } else {
-                                console.log(
-                                  "Given Directory already exists !!"
-                                );
-                              }
-                            });
-                          }
-                        }
-                      }
-
-                      // console.log(`aws array ${myArrays}`);
-                    }
+                  if (err) throw err;
+                  // Fail if the file can't be read.
+                  myArrays.push(
+                    JSobj.myArrayslist[0][index].path
+                      .toString()
+                      .replace("imageupload", "")
+                      .toString()
+                      .split("\\")
+                      .join("/")
                   );
+                  if (index === arrays.length - 1) {
+                    if (myArrays != null) {
+                      new Promise((f) => setTimeout(f, 2000));
+                      res.send({
+                        code: 201,
+                        message: "file uploaded",
+                        imagedatalength: req.files?.length,
+                        data: myArrays,
+                        recivied: true,
+                      });
+                    }
+                  }
+
+                  // imagekit.upload(
+                  //   {
+                  //     file: data, //required
+                  //     fileName: `${JSobj.myArrayslist[0][index].filename}`, //required
+                  //   },
+                  //   async function (error, result) {
+                  //     if (error) {
+                  //       res.send({
+                  //         code: 306,
+                  //         message: "file not upload",
+                  //         data: null,
+                  //       });
+                  //       console.log(`imagekit err ${err}`);
+                  //     } else {
+                  //       myArrays.push(result?.url);
+                  //       if (index === arrays.length - 1) {
+                  //         if (result?.url != null) {
+                  //           await new Promise((f) => setTimeout(f, 2000));
+                  //           res.send({
+                  //             code: 201,
+                  //             message: "file uploaded",
+                  //             imagedatalength: req.files?.length,
+                  //             data: myArrays,
+                  //             recivied: true,
+                  //           });
+                  //           //  await sleep();
+                  //           //   console.log("loop is closed");
+                  //           await new Promise((f) => setTimeout(f, 1000));
+                  //           fs.rmSync("./imageupload/images", {
+                  //             recursive: true,
+                  //           });
+                  //           await new Promise((f) => setTimeout(f, 1000));
+                  //           console.log("done");
+                  //           fs.access("./imageupload/images", (error) => {
+                  //             // To check if the given directory
+                  //             // already exists or not
+                  //             if (error) {
+                  //               // If current directory does not exist
+                  //               // then create it
+                  //               fs.mkdir("./imageupload/images", (error) => {
+                  //                 if (error) {
+                  //                   console.log(error);
+                  //                 } else {
+                  //                   console.log(
+                  //                     "New Directory created successfully !!"
+                  //                   );
+                  //                 }
+                  //               });
+                  //             } else {
+                  //               console.log(
+                  //                 "Given Directory already exists !!"
+                  //               );
+                  //             }
+                  //           });
+                  //         }
+                  //       }
+                  //     }
+
+                  //     // console.log(`aws array ${myArrays}`);
+                  //   }
+                  // );
                 }
               );
             });
@@ -386,30 +415,36 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
             });
           }
           console.log(`file path ${req.file?.path}`);
-
-          fs.readFile(`${req.file?.path}`, function (err, data) {
+          fs.readFile(`${req.file?.path}`, "utf8", function (err, data) {
             if (err) throw err; // Fail if the file can't be read.
-            imagekit.upload(
-              {
-                file: data, //required
-                fileName: `${req.file?.filename}`, //required
-              },
-              function (error, result) {
-                if (error) {
-                  res.send({
-                    message: "not uploaded",
-                    data: null,
-                    code: 301,
-                  });
-                }
-                //  console.log(req.file);
-                res.send({
-                  message: "uplaod sucessfully",
-                  data: result?.url,
-                  code: 201,
-                });
-              }
-            );
+            if (err) {
+              res.send({
+                message: "not uploaded",
+                data: null,
+                code: 301,
+              });
+            }
+            res.send({
+              message: "uplaod sucessfully",
+              data: `${req.file?.path
+                .toString()
+                .replace("imageupload", "")
+                .toString()
+                .split("\\")
+                .join("/")}`,
+              code: 201,
+            });
+            //  console.log(req.file);
+
+            // imagekit.upload(
+            //   {
+            //     file: data, //required
+            //     fileName: `${req.file?.filename}`, //required
+            //   },
+            //   function (error, result) {
+
+            //   }
+            // );
           });
         });
       }
@@ -535,6 +570,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
         ])
         .getMany();
 
@@ -572,6 +608,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
         ])
         .getMany();
       if (fullscreenpost !== undefined) {
@@ -611,6 +648,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
         ])
         .where("fullscreenpost.fs_post_isapproved = :fs_post_isapproved", {
           fs_post_isapproved: isapproved,
@@ -657,6 +695,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
         ])
         .where("fullscreenpost.fs_post_isapproved = :fs_post_isapproved", {
           fs_post_isapproved: "false",
@@ -700,6 +739,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
         ])
         .andWhere("category.category_id = :parent_category_id", {
           parent_category_id,
@@ -775,6 +815,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           "users.username",
           "usersinfo.info_id",
           "usersinfo.profileimage",
+          "usersinfo.customimage",
         ])
         .where("users.useremail = :useremail", { useremail })
         .getMany();

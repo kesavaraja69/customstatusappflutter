@@ -6,7 +6,7 @@ import { UserRepository } from "../../authentication/repository/users.repositroy
 @EntityRepository(UserInfoEntity)
 export class UserInfoRepository extends Repository<UserInfoEntity> {
   async submitUserInfo(req: Request, res: Response) {
-    let { useremail, aboutyourself, profileimage } = req.body;
+    let { useremail, aboutyourself, profileimage,customimage } = req.body;
 
     try {
       let userRepository = getCustomRepository(UserRepository);
@@ -15,6 +15,7 @@ export class UserInfoRepository extends Repository<UserInfoEntity> {
         let userinfo = new UserInfoEntity();
         userinfo.aboutyourself = aboutyourself;
         userinfo.profileimage = profileimage;
+        userinfo.customimage = customimage;
         userinfo.user = user!;
         await userinfo.save();
         res.send({
@@ -81,7 +82,7 @@ export class UserInfoRepository extends Repository<UserInfoEntity> {
   }
 
   async updateuserProfile(req: Request, res: Response) {
-    let { useremail, aboutyourself, profileimage, info_id } = req.body;
+    let { useremail, aboutyourself, profileimage, info_id,customimage } = req.body;
     try {
       let userRepository = getCustomRepository(UserRepository);
       let user = await userRepository.findOne({ useremail });
@@ -89,7 +90,7 @@ export class UserInfoRepository extends Repository<UserInfoEntity> {
         if (profileimage != null || profileimage != undefined) {
           await this.createQueryBuilder("usersinfo")
             .update(UserInfoEntity)
-            .set({ aboutyourself, profileimage })
+            .set({ aboutyourself, profileimage ,customimage})
             .where("usersinfo.info_id = :info_id", { info_id })
             .execute()
             .then((data: any) => {
