@@ -23,11 +23,11 @@ dotenv.config();
 const connectionOptions: ConnectionOptions = {
  // url: process.env.DATABASE_URL,
   type: "postgres",
-  host: process.env.Host || "localhost",
+  host: process.env.StatusHost || "localhost",
   port: 5432,
-  username: process.env.User || "postgres",
-  password: process.env.DB_Password || "dragon69",
-  database: process.env.Database || "statusapp",
+  username: process.env.StatusUser || "postgres",
+  password: process.env.StatusDB_Password || "dragon69",
+  database: process.env.StatusDatabase || "statusapp",
   synchronize: !process.env.DB_NO_SYNC,
   logging: !process.env.DB_NO_LOGS,
   entities: [

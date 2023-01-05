@@ -27,7 +27,7 @@ createConnection(config as ConnectionOptions).then(async (connection) => {
   }
 
   const app = express();
-  const port = process.env.PORT || 8282;
+  const port = process.env.PORT || 8484;
   app.use(cors());
   
   app.use(express.json());
