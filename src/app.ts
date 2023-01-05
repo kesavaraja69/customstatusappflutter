@@ -20,6 +20,7 @@ import { rewardRouter } from "./routes/reward.routes";
 import { amountRouter } from "./routes/amount.routes";
 import { contactusRouter } from "./routes/contactus.routes";
 import path from "path";
+import { router } from "./routes/router.routes";
 
 createConnection(config as ConnectionOptions).then(async (connection) => {
   if (connection.isConnected) {
@@ -32,7 +33,7 @@ createConnection(config as ConnectionOptions).then(async (connection) => {
   
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
-
+  app.use("/api", router);
   app.use("/api/users", authenticationRouter);
   app.use("/api/usersinfo", userinfoRouter);
   app.use("/api/categorys", categoryRouter);
