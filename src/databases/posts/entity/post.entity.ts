@@ -7,19 +7,19 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   ViewEntity,
-} from "typeorm";
-import { UserEntity } from "../../authentication/entity/users.entity";
-import { BookmarkEntity } from "../../bookmark/entity/bookmark.entity";
-import { CategoryEntity } from "../../categorys/entity/category.entity";
-import { CommentEntity } from "../../comments/entity/comment.entity";
-import { DownloadEntity } from "../../downloads/entity/download.entity";
-import { LikeEntity } from "../../likes/entity/likes.entity";
-import { RewardEntity } from "../../rewards/entity/reward.entity";
-import { ShareEntity } from "../../share/entity/share.entity";
-import { SubCategoryEntity } from "../../subcategory/entity/subcategory.entity";
-import { ViewsEntity } from "../../views/entity/views.entity";
+} from 'typeorm';
+import { UserEntity } from '../../authentication/entity/users.entity';
+import { BookmarkEntity } from '../../bookmark/entity/bookmark.entity';
+import { CategoryEntity } from '../../categorys/entity/category.entity';
+import { CommentEntity } from '../../comments/entity/comment.entity';
+import { DownloadEntity } from '../../downloads/entity/download.entity';
+import { LikeEntity } from '../../likes/entity/likes.entity';
+import { RewardEntity } from '../../rewards/entity/reward.entity';
+import { ShareEntity } from '../../share/entity/share.entity';
+import { SubCategoryEntity } from '../../subcategory/entity/subcategory.entity';
+import { ViewsEntity } from '../../views/entity/views.entity';
 
-@Entity("post")
+@Entity('post')
 export class PostEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   post_id!: string;
@@ -38,6 +38,16 @@ export class PostEntity extends BaseEntity {
     nullable: false,
   })
   post_category!: string;
+
+  @Column({
+    nullable: true,
+  })
+  post_rewardpoint!: string;
+
+  @Column({
+    nullable: true,
+  })
+  post_adloaded!: string;
 
   @Column({
     nullable: false,
@@ -60,32 +70,32 @@ export class PostEntity extends BaseEntity {
   post_yt_video_url!: string;
 
   @Column({
-    type: "boolean",
+    type: 'boolean',
     default: false,
   })
   post_isvideo!: boolean;
 
   @Column({
-    type: "boolean",
+    type: 'boolean',
     default: false,
   })
   post_isvideo_portrait!: boolean;
 
   @Column({
-    type: "boolean",
+    type: 'boolean',
     default: false,
   })
   post_isyoutubevideo!: boolean;
 
   @Column({
-    type: "simple-array",
+    type: 'simple-array',
     nullable: true,
   })
   post_images!: string[];
 
   @Column({
-    type: "timestamp",
-    default: () => "CURRENT_TIMESTAMP(6)",
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
     nullable: false,
   })
   post_date!: Date;
@@ -97,12 +107,12 @@ export class PostEntity extends BaseEntity {
   )
   subcategoryposts!: SubCategoryEntity;
 
-    //! connection to maincategory
-    @ManyToOne(
-      () => CategoryEntity,
-      (maincategoryposts) => maincategoryposts.posts
-    )
-    maincategoryposts!: CategoryEntity;
+  //! connection to maincategory
+  @ManyToOne(
+    () => CategoryEntity,
+    (maincategoryposts) => maincategoryposts.posts
+  )
+  maincategoryposts!: CategoryEntity;
 
   //! connection to like entity
   @OneToMany(() => LikeEntity, (post_likes) => post_likes.likes_post)
@@ -116,13 +126,12 @@ export class PostEntity extends BaseEntity {
 
   //! connection to reward entity
   @OneToMany(() => RewardEntity, (post_reward) => post_reward.reward_post)
-  @JoinColumn()
   post_reward!: RewardEntity[];
 
   //! connection to users
   @ManyToOne(() => UserEntity, (upload_user) => upload_user.post, {
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   upload_user!: UserEntity;
 

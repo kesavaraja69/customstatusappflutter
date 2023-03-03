@@ -1,6 +1,6 @@
-import { getCustomRepository } from "typeorm";
-import { Request, Response } from "express";
-import { RewardpointRepository } from "../databases/rewards/repositiory/reward.repositiory";
+import { getCustomRepository } from 'typeorm';
+import { Request, Response } from 'express';
+import { RewardpointRepository } from '../databases/rewards/repositiory/reward.repositiory';
 
 export class RewardController {
   //! post
@@ -12,5 +12,10 @@ export class RewardController {
   static async fetchPostreward(req: Request, res: Response) {
     let rewardRepository = getCustomRepository(RewardpointRepository);
     await rewardRepository.fetchPostreward(req, res);
+  }
+  
+  static async removerewardpoint(req: Request, res: Response) {
+    let rewardRepository = getCustomRepository(RewardpointRepository);
+    await rewardRepository.removerewardpoint(req, res);
   }
 }

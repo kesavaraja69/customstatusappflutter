@@ -1,14 +1,14 @@
-import { Request, Response } from "express";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-import * as EmailValidator from "email-validator";
-import bycrypt from "bcrypt";
+import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import * as EmailValidator from 'email-validator';
+import bycrypt from 'bcrypt';
 import {
   createQueryBuilder,
   getCustomRepository,
   getRepository,
-} from "typeorm";
-import { UserRepository } from "../databases/authentication/repository/users.repositroy";
+} from 'typeorm';
+import { UserRepository } from '../databases/authentication/repository/users.repositroy';
 dotenv.config();
 export class AuthenticationControllers {
   static createJWt = async (payload: any, res: Response) => {
@@ -17,13 +17,13 @@ export class AuthenticationControllers {
       { payload },
       jwt_secret,
       {
-        expiresIn: "1hr",
+        expiresIn: '1hr',
       },
       async (error: any, jwtData: any) => {
         if (error) {
           return res.send({
             user: null,
-            message: "something went wrong",
+            message: 'something went wrong',
             authenticated: false,
             code: 402,
           });
@@ -47,26 +47,26 @@ export class AuthenticationControllers {
       return res.send({
         user: null,
         authentication: false,
-        message: "invalid email",
+        message: 'invalid email',
         code: 302,
       });
     }
 
     let isExiting =
       (await getCustomRepository(UserRepository)
-        .createQueryBuilder("users")
+        .createQueryBuilder('users')
         .select()
-        .where("users.useremail = :useremail", { useremail })
+        .where('users.useremail = :useremail', { useremail })
         .getCount()) > 0;
 
     if (isExiting) {
       return res.send({
         user: null,
-        message: "user is already exsiting",
+        message: 'user is already exsiting',
         authenticated: false,
         code: 400,
       });
-    } else{
+    } else {
       let salt = await bycrypt.genSalt(10);
 
       bycrypt.hash(
@@ -76,22 +76,20 @@ export class AuthenticationControllers {
           if (error) {
             return res.send({
               user: null,
-              message: "something went wrong",
+              message: 'something went wrong',
               authenticated: false,
               code: 403,
             });
           }
           console.log(hashedpassword);
-  
+
           let userRepository = getCustomRepository(UserRepository);
           await userRepository.submitUserData(req, res, hashedpassword);
           await AuthenticationControllers.createJWt(useremail, res);
         }
       );
     }
-  
   }
-
 
   static async createAdminAccount(req: Request, res: Response) {
     let { useremail, userpassword } = req.body;
@@ -102,7 +100,7 @@ export class AuthenticationControllers {
       return res.send({
         user: null,
         authentication: false,
-        message: "invalid email",
+        message: 'invalid email',
         code: 302,
       });
     }
@@ -116,7 +114,7 @@ export class AuthenticationControllers {
         if (error) {
           return res.send({
             user: null,
-            message: "something went wrong",
+            message: 'something went wrong',
             authenticated: false,
             code: 403,
           });
@@ -153,6 +151,11 @@ export class AuthenticationControllers {
   static async updatewithlowamountpoint(req: Request, res: Response) {
     let userRepository = getCustomRepository(UserRepository);
     await userRepository.updatewithlowamountpoint(req, res);
+  }
+
+  static async updateamountremovepoint(req: Request, res: Response) {
+    let userRepository = getCustomRepository(UserRepository);
+    await userRepository.updateamountremovepoint(req, res);
   }
 
   static async updatetodaypaymentid(req: Request, res: Response) {
@@ -213,22 +216,22 @@ export class AuthenticationControllers {
         return res.send({
           user: null,
           authentication: false,
-          message: "invalid email",
+          message: 'invalid email',
           code: 402,
         });
       }
 
       let userRepository = getCustomRepository(UserRepository);
       let checkuser = await getCustomRepository(UserRepository)
-        .createQueryBuilder("users")
+        .createQueryBuilder('users')
         .select()
-        .where("users.useremail = :useremail", { useremail })
+        .where('users.useremail = :useremail', { useremail })
         .getOne();
 
       if (checkuser === undefined) {
         return res.send({
           user: null,
-          message: "user not found",
+          message: 'user not found',
           authenticated: false,
           code: 407,
         });
@@ -243,14 +246,14 @@ export class AuthenticationControllers {
           async (error: any, isMatched: boolean) => {
             if (error) {
               return res.send({
-                message: "something went wrong",
+                message: 'something went wrong',
                 authenticated: false,
                 code: 403,
               });
             }
             if (!isMatched) {
               return res.send({
-                message: "wrong password",
+                message: 'wrong password',
                 authenticated: false,
                 code: 409,
               });
@@ -277,7 +280,7 @@ export class AuthenticationControllers {
       return res.send({
         user: null,
         authentication: false,
-        message: "invalid email",
+        message: 'invalid email',
         code: 402,
       });
     }
@@ -294,14 +297,14 @@ export class AuthenticationControllers {
         async (error: any, isMatched: boolean) => {
           if (error) {
             return res.send({
-              message: "something went wrong",
+              message: 'something went wrong',
               authenticated: false,
               code: 403,
             });
           }
           if (!isMatched) {
             return res.send({
-              message: "wrong password",
+              message: 'wrong password',
               authenticated: false,
               code: 409,
             });
@@ -312,7 +315,7 @@ export class AuthenticationControllers {
       );
     } else {
       return res.send({
-        message: "your not admin",
+        message: 'your not admin',
         authenticated: false,
         code: 503,
       });
@@ -327,7 +330,7 @@ export class AuthenticationControllers {
       if (error) {
         return res.send({
           authentication: false,
-          message: "something went wrong",
+          message: 'something went wrong',
         });
       }
       let useremail = data!.useremail;

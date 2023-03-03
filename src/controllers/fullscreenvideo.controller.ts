@@ -1,10 +1,8 @@
-import { getCustomRepository } from "typeorm";
-import { Request, Response } from "express";
-import { FullScreenPostRepository } from "../databases/post_fullscreen/repository/postfullscreen.repository";
+import { getCustomRepository } from 'typeorm';
+import { Request, Response } from 'express';
+import { FullScreenPostRepository } from '../databases/post_fullscreen/repository/postfullscreen.repository';
 
 export class FullScreenVideoController {
-
-  
   static async imagekitioupload(req: Request, res: Response) {
     let subcategoryRepository = getCustomRepository(FullScreenPostRepository);
     await subcategoryRepository.imagekitioupload(req, res);
@@ -21,6 +19,11 @@ export class FullScreenVideoController {
   static async fetchFullScreenPost(req: Request, res: Response) {
     let subcategoryRepository = getCustomRepository(FullScreenPostRepository);
     await subcategoryRepository.fetchFullScreenPost(req, res);
+  }
+
+  static async removefullscnpost(req: Request, res: Response) {
+    let subcategoryRepository = getCustomRepository(FullScreenPostRepository);
+    await subcategoryRepository.removefullscnpost(req, res);
   }
 
   static async fetchfullscreenuserBookmark(req: Request, res: Response) {

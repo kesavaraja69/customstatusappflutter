@@ -6,18 +6,19 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-} from "typeorm";
-import { UserEntity } from "../../authentication/entity/users.entity";
-import { BookmarkEntity } from "../../bookmark/entity/bookmark.entity";
-import { CategoryEntity } from "../../categorys/entity/category.entity";
-import { CommentEntity } from "../../comments/entity/comment.entity";
-import { DownloadEntity } from "../../downloads/entity/download.entity";
-import { LikeEntity } from "../../likes/entity/likes.entity";
-import { ShareEntity } from "../../share/entity/share.entity";
-import { SubCategoryEntity } from "../../subcategory/entity/subcategory.entity";
-import { ViewsEntity } from "../../views/entity/views.entity";
+} from 'typeorm';
+import { UserEntity } from '../../authentication/entity/users.entity';
+import { BookmarkEntity } from '../../bookmark/entity/bookmark.entity';
+import { CategoryEntity } from '../../categorys/entity/category.entity';
+import { CommentEntity } from '../../comments/entity/comment.entity';
+import { DownloadEntity } from '../../downloads/entity/download.entity';
+import { LikeEntity } from '../../likes/entity/likes.entity';
+import { ShareEntity } from '../../share/entity/share.entity';
+import { SubCategoryEntity } from '../../subcategory/entity/subcategory.entity';
+import { ViewsEntity } from '../../views/entity/views.entity';
+import { RewardEntity } from '../../rewards/entity/reward.entity';
 
-@Entity("fullscreenpost")
+@Entity('fullscreenpost')
 export class FullScreenPostEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   fs_post_id!: string;
@@ -31,6 +32,11 @@ export class FullScreenPostEntity extends BaseEntity {
     nullable: false,
   })
   fs_post_description!: string;
+
+  @Column({
+    nullable: true,
+  })
+  fs_post_rewardpoint!: string;
 
   @Column({
     nullable: false,
@@ -53,8 +59,8 @@ export class FullScreenPostEntity extends BaseEntity {
   fs_post_category!: string;
 
   @Column({
-    type: "timestamp",
-    default: () => "CURRENT_TIMESTAMP(6)",
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP(6)',
     nullable: false,
   })
   fs_post_date!: Date;
@@ -71,8 +77,8 @@ export class FullScreenPostEntity extends BaseEntity {
   )
   category_post!: SubCategoryEntity;
 
-   //! connection to parentcategory
-   @ManyToOne(
+  //! connection to parentcategory
+  @ManyToOne(
     () => CategoryEntity,
     (maincategory_post) => maincategory_post.fullScreen_post
   )
@@ -80,8 +86,8 @@ export class FullScreenPostEntity extends BaseEntity {
 
   //! connection to users
   @ManyToOne(() => UserEntity, (upload_user) => upload_user.fullscreenvideo, {
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   upload_user!: UserEntity;
 
@@ -105,10 +111,17 @@ export class FullScreenPostEntity extends BaseEntity {
   @JoinColumn()
   post_fs_likes!: LikeEntity[];
 
-   //! connection to view
-   @OneToMany(() => ViewsEntity, (post_fs_views) => post_fs_views.views_post_fs)
-   @JoinColumn()
-   post_fs_views!: ViewsEntity[];
+  //! connection to view
+  @OneToMany(() => ViewsEntity, (post_fs_views) => post_fs_views.views_post_fs)
+  @JoinColumn()
+  post_fs_views!: ViewsEntity[];
+
+  //! connection to reward entity
+  @OneToMany(
+    () => RewardEntity,
+    (fs_post_reward) => fs_post_reward.reward_post_fs
+  )
+  fs_post_reward!: RewardEntity[];
 
   //! connection to share
   @OneToMany(() => ShareEntity, (post_fs_share) => post_fs_share.share_post_fs)
@@ -123,4 +136,3 @@ export class FullScreenPostEntity extends BaseEntity {
   @JoinColumn()
   post_fs_comment!: CommentEntity[];
 }
-

@@ -1,10 +1,10 @@
-import { EntityRepository, getCustomRepository, Repository } from "typeorm";
-import { Request, Response } from "express";
-import dotenv from "dotenv";
-import { PostEntity } from "../entity/post.entity";
-import { SubCategoryRepository } from "../../subcategory/repository/subcategory.repository";
-import { UserRepository } from "../../authentication/repository/users.repositroy";
-import { CategoryRepository } from "../../categorys/repositroy/category.repositroy";
+import { EntityRepository, getCustomRepository, Repository } from 'typeorm';
+import { Request, Response } from 'express';
+import dotenv from 'dotenv';
+import { PostEntity } from '../entity/post.entity';
+import { SubCategoryRepository } from '../../subcategory/repository/subcategory.repository';
+import { UserRepository } from '../../authentication/repository/users.repositroy';
+import { CategoryRepository } from '../../categorys/repositroy/category.repositroy';
 
 dotenv.config();
 @EntityRepository(PostEntity)
@@ -25,6 +25,7 @@ export class PostRepository extends Repository<PostEntity> {
       post_yt_video_url,
       post_isyoutubevideo,
       post_isvideo_portrait,
+      postrewardpoint,
     } = req.body;
 
     let maincategoryRepository = getCustomRepository(CategoryRepository);
@@ -39,9 +40,9 @@ export class PostRepository extends Repository<PostEntity> {
       postentity.upload_user = user!;
       postentity.post_name = post_name;
       if (admin_token === base_admin_sceret_kry) {
-        postentity.post_isapproved = "true";
+        postentity.post_isapproved = 'true';
       } else {
-        postentity.post_isapproved = "false";
+        postentity.post_isapproved = 'false';
       }
       postentity.post_description = post_description;
       postentity.post_category = post_category;
@@ -51,7 +52,8 @@ export class PostRepository extends Repository<PostEntity> {
       postentity.post_yt_video_url = post_yt_video_url;
       postentity.post_isvideo_portrait = post_isvideo_portrait;
       postentity.post_isyoutubevideo = post_isyoutubevideo;
-      postentity.post_view = "0";
+      postentity.post_view = '0';
+      postentity.post_rewardpoint = postrewardpoint;
       postentity.maincategoryposts = parentsub_category_id!;
       await postentity
         .save()
@@ -59,7 +61,7 @@ export class PostRepository extends Repository<PostEntity> {
           if (data) {
             res.send({
               code: 201,
-              message: "post added under database",
+              message: 'post added under database',
               submitted: true,
             });
           }
@@ -68,7 +70,7 @@ export class PostRepository extends Repository<PostEntity> {
           if (error) {
             res.send({
               code: 402,
-              message: "something went wrong ,try again",
+              message: 'something went wrong ,try again',
               submitted: false,
             });
           }
@@ -76,25 +78,64 @@ export class PostRepository extends Repository<PostEntity> {
     } else {
       res.send({
         code: 303,
-        message: "user not found",
+        message: 'user not found',
         submitted: false,
       });
     }
   }
 
+  async removepost(req: Request, res: Response) {
+    try {
+      let { postid } = req.params;
+      await this.createQueryBuilder('post')
+        .delete()
+        .from(PostEntity)
+        .where('post_id = :postid', { postid })
+        .execute()
+        .then((data: any) => {
+          let isAffected = data.affected;
+          if (isAffected > 0) {
+            return res.send({
+              code: 201,
+              data: 'post removed',
+              removed: true,
+            });
+          } else {
+            return res.send({
+              code: 301,
+              data: 'not removed',
+              removed: false,
+            });
+          }
+        })
+        .catch((error: any) => {
+          if (error !== undefined) {
+            console.log(error);
+            return res.send({
+              code: 403,
+              data: 'something went wrong',
+              removed: false,
+            });
+          }
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async fetchPost(req: Request, res: Response) {
     try {
-      let post = await this.createQueryBuilder("post")
-        .leftJoinAndSelect("post.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      let post = await this.createQueryBuilder('post')
+        .leftJoinAndSelect('post.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         .select([
-          "post",
-          "users.id",
-          "users.useremail",
-          "users.username",
-          "usersinfo.info_id",
-          "usersinfo.profileimage",
-          "usersinfo.customimage",
+          'post',
+          'users.id',
+          'users.useremail',
+          'users.username',
+          'usersinfo.info_id',
+          'usersinfo.profileimage',
+          'usersinfo.customimage',
         ])
         .getMany();
 
@@ -102,7 +143,7 @@ export class PostRepository extends Repository<PostEntity> {
         res.send({
           code: 201,
           data: post,
-          message: "Fetched Sucessfully",
+          message: 'Fetched Sucessfully',
           received: true,
         });
       }
@@ -111,7 +152,7 @@ export class PostRepository extends Repository<PostEntity> {
         res.send({
           code: 402,
           data: null,
-          message: "something went wrong,try again",
+          message: 'something went wrong,try again',
           received: false,
         });
       }
@@ -121,14 +162,11 @@ export class PostRepository extends Repository<PostEntity> {
   async fetchdownloadsPostbyuser(req: Request, res: Response) {
     let { useremail } = req.params;
     try {
-      let fullscreenpost = await this.createQueryBuilder("post")
-        .leftJoinAndSelect("post.post_download", "download")
-        .leftJoin("download.downloads_user", "users")
-        .select([
-          "post",
-          "download.download_id"
-        ])
-        .andWhere("users.useremail = :useremail", { useremail })
+      let fullscreenpost = await this.createQueryBuilder('post')
+        .leftJoinAndSelect('post.post_download', 'download')
+        .leftJoin('download.downloads_user', 'users')
+        .select(['post', 'download.download_id'])
+        .andWhere('users.useremail = :useremail', { useremail })
         .getMany();
       if (fullscreenpost !== undefined) {
         res.send({
@@ -147,7 +185,7 @@ export class PostRepository extends Repository<PostEntity> {
       if (error) {
         res.send({
           code: 402,
-          data: "something went wrong,try again",
+          data: 'something went wrong,try again',
           received: false,
         });
       }
@@ -158,15 +196,12 @@ export class PostRepository extends Repository<PostEntity> {
     try {
       let { useremail } = req.params;
 
-      var response = await this.createQueryBuilder("post")
-        .leftJoinAndSelect("post.post_bookmark", "bookmark")
-        .leftJoinAndSelect("bookmark.bookmark_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
-        .select([
-          "post",
-          "bookmark.bookmark_id",
-        ])
-        .where("users.useremail = :useremail", { useremail })
+      var response = await this.createQueryBuilder('post')
+        .leftJoinAndSelect('post.post_bookmark', 'bookmark')
+        .leftJoinAndSelect('bookmark.bookmark_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
+        .select(['post', 'bookmark.bookmark_id'])
+        .where('users.useremail = :useremail', { useremail })
         .getMany();
       if (response !== undefined) {
         return res.send({
@@ -176,7 +211,7 @@ export class PostRepository extends Repository<PostEntity> {
       } else {
         return res.send({
           code: 301,
-          data: "no data available",
+          data: 'no data available',
         });
       }
     } catch (error) {
@@ -188,19 +223,19 @@ export class PostRepository extends Repository<PostEntity> {
     try {
       let { post_id } = req.params;
 
-      var response = await this.createQueryBuilder("post")
-        .leftJoin("post.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      var response = await this.createQueryBuilder('post')
+        .leftJoin('post.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         .select([
-          "post",
-          "users.id",
-          "users.useremail",
-          "users.username",
-          "usersinfo.info_id",
-          "usersinfo.profileimage",
-          "usersinfo.customimage",
+          'post',
+          'users.id',
+          'users.useremail',
+          'users.username',
+          'usersinfo.info_id',
+          'usersinfo.profileimage',
+          'usersinfo.customimage',
         ])
-        .where("post.post_id = :post_id", { post_id })
+        .where('post.post_id = :post_id', { post_id })
         .getOne();
       if (response !== undefined) {
         return res.send({
@@ -210,7 +245,7 @@ export class PostRepository extends Repository<PostEntity> {
       } else {
         return res.send({
           code: 301,
-          data: "no data available",
+          data: 'no data available',
         });
       }
     } catch (error) {
@@ -221,20 +256,20 @@ export class PostRepository extends Repository<PostEntity> {
   async fetchPostbycateroyid(req: Request, res: Response) {
     let { parent_category_id } = req.params;
     try {
-      let post = await this.createQueryBuilder("post")
-        .leftJoinAndSelect("post.maincategoryposts", "category")
-        .leftJoinAndSelect("post.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      let post = await this.createQueryBuilder('post')
+        .leftJoinAndSelect('post.maincategoryposts', 'category')
+        .leftJoinAndSelect('post.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         .select([
-          "post",
-          "users.id",
-          "users.useremail",
-          "users.username",
-          "usersinfo.info_id",
-          "usersinfo.profileimage",
-          "usersinfo.customimage",
+          'post',
+          'users.id',
+          'users.useremail',
+          'users.username',
+          'usersinfo.info_id',
+          'usersinfo.profileimage',
+          'usersinfo.customimage',
         ])
-        .andWhere("category.category_id = :parent_category_id", {
+        .andWhere('category.category_id = :parent_category_id', {
           parent_category_id,
         })
         .getMany();
@@ -243,7 +278,7 @@ export class PostRepository extends Repository<PostEntity> {
         res.send({
           code: 201,
           data: post,
-          message: "Fetched Sucessfully",
+          message: 'Fetched Sucessfully',
           received: true,
         });
       }
@@ -252,7 +287,7 @@ export class PostRepository extends Repository<PostEntity> {
         res.send({
           code: 402,
           data: null,
-          message: "something went wrong,try again",
+          message: 'something went wrong,try again',
           received: false,
         });
       }
@@ -261,20 +296,20 @@ export class PostRepository extends Repository<PostEntity> {
 
   async fetchPostrandomly(req: Request, res: Response) {
     try {
-      let post = await this.createQueryBuilder("post")
-        .leftJoinAndSelect("post.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      let post = await this.createQueryBuilder('post')
+        .leftJoinAndSelect('post.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         // .from(PostEntity,"post")
         .select([
-          "post",
-          "users.id",
-          "users.useremail",
-          "users.username",
-          "usersinfo.info_id",
-          "usersinfo.profileimage",
-          "usersinfo.customimage",
+          'post',
+          'users.id',
+          'users.useremail',
+          'users.username',
+          'usersinfo.info_id',
+          'usersinfo.profileimage',
+          'usersinfo.customimage',
         ])
-        .orderBy("RANDOM()")
+        .orderBy('RANDOM()')
         .limit(4)
         .getMany();
 
@@ -282,7 +317,7 @@ export class PostRepository extends Repository<PostEntity> {
         res.send({
           code: 201,
           data: post,
-          message: "Fetched Sucessfully",
+          message: 'Fetched Sucessfully',
           received: true,
         });
       }
@@ -291,7 +326,7 @@ export class PostRepository extends Repository<PostEntity> {
         res.send({
           code: 402,
           data: null,
-          message: "something went wrong,try again",
+          message: 'something went wrong,try again',
           received: false,
         });
       }
@@ -301,38 +336,38 @@ export class PostRepository extends Repository<PostEntity> {
   async fetchpostdetail(req: Request, res: Response) {
     let { post_id } = req.params;
     try {
-      let postdetail = await this.createQueryBuilder("post")
-        .leftJoinAndSelect("post.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      let postdetail = await this.createQueryBuilder('post')
+        .leftJoinAndSelect('post.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         .select([
-          "post",
-          "users.id",
-          "users.useremail",
-          "users.username",
-          "usersinfo.info_id",
-          "usersinfo.profileimage",
-          "usersinfo.customimage",
+          'post',
+          'users.id',
+          'users.useremail',
+          'users.username',
+          'usersinfo.info_id',
+          'usersinfo.profileimage',
+          'usersinfo.customimage',
         ])
-        .where("post.post_id = :post_id", { post_id })
+        .where('post.post_id = :post_id', { post_id })
         .getOne();
       if (postdetail !== undefined) {
         res.send({
           code: 201,
           data: postdetail,
-          message: "recivied",
+          message: 'recivied',
         });
       } else {
         res.send({
           code: 302,
           data: null,
-          message: "not recivied",
+          message: 'not recivied',
         });
       }
     } catch (error) {
       res.send({
         code: 403,
         data: null,
-        message: "something went wrong",
+        message: 'something went wrong',
       });
     }
   }
@@ -340,26 +375,26 @@ export class PostRepository extends Repository<PostEntity> {
   async fetchallPostbyuser(req: Request, res: Response) {
     let { useremail } = req.params;
     try {
-      let post = await this.createQueryBuilder("post")
-        .leftJoinAndSelect("post.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      let post = await this.createQueryBuilder('post')
+        .leftJoinAndSelect('post.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         .select([
-          "post",
-          "users.id",
-          "users.useremail",
-          "users.username",
-          "usersinfo.info_id",
-          "usersinfo.profileimage",
-          "usersinfo.customimage",
+          'post',
+          'users.id',
+          'users.useremail',
+          'users.username',
+          'usersinfo.info_id',
+          'usersinfo.profileimage',
+          'usersinfo.customimage',
         ])
-        .where("users.useremail = :useremail", { useremail })
+        .where('users.useremail = :useremail', { useremail })
         .getMany();
 
       if (post !== undefined) {
         res.send({
           code: 201,
           data: post,
-          message: "Fetched Sucessfully",
+          message: 'Fetched Sucessfully',
           received: true,
         });
       }
@@ -368,7 +403,7 @@ export class PostRepository extends Repository<PostEntity> {
         res.send({
           code: 402,
           data: null,
-          message: "something went wrong,try again",
+          message: 'something went wrong,try again',
           received: false,
         });
       }
@@ -379,33 +414,33 @@ export class PostRepository extends Repository<PostEntity> {
   async fetchCommentpost(req: Request, res: Response) {
     let { post_id } = req.params;
     try {
-      let response = await this.createQueryBuilder("post")
-        .leftJoinAndSelect("post.post_comment", "comment")
-        .leftJoinAndSelect("post.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      let response = await this.createQueryBuilder('post')
+        .leftJoinAndSelect('post.post_comment', 'comment')
+        .leftJoinAndSelect('post.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         .select([
-          "post",
-          "users.id",
-          "comment",
-          "users.useremail",
-          "users.username",
-          "usersinfo.info_id",
-          "usersinfo.profileimage",
-          "usersinfo.customimage",
+          'post',
+          'users.id',
+          'comment',
+          'users.useremail',
+          'users.username',
+          'usersinfo.info_id',
+          'usersinfo.profileimage',
+          'usersinfo.customimage',
         ])
-        .where("post.post_id = :post_id", { post_id })
+        .where('post.post_id = :post_id', { post_id })
         .getMany();
       let data1 = response.length > 0;
       if (!data1) {
         return res.send({
           code: 204,
-          message: "data is empty",
+          message: 'data is empty',
           data: null,
         });
       } else {
         return res.send({
           code: 201,
-          message: "data avalaible",
+          message: 'data avalaible',
           data: response,
         });
       }
@@ -413,30 +448,30 @@ export class PostRepository extends Repository<PostEntity> {
       if (error) {
         return res.send({
           code: 401,
-          message: "something went wrong",
+          message: 'something went wrong',
           data: null,
         });
       }
     }
   }
 
-   //! approved all posts
-   async fetchFullPostappall(req: Request, res: Response) {
+  //! approved all posts
+  async fetchFullPostappall(req: Request, res: Response) {
     let { isapproved } = req.params;
     try {
-      let fullscreenpost = await this.createQueryBuilder("post")
-        .leftJoinAndSelect("post.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      let fullscreenpost = await this.createQueryBuilder('post')
+        .leftJoinAndSelect('post.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         .select([
-          "post",
-          "users.id",
-          "users.useremail",
-          "users.username",
-          "usersinfo.info_id",
-          "usersinfo.profileimage",
-          "usersinfo.customimage",
+          'post',
+          'users.id',
+          'users.useremail',
+          'users.username',
+          'usersinfo.info_id',
+          'usersinfo.profileimage',
+          'usersinfo.customimage',
         ])
-        .where("post.post_isapproved = :post_isapproved", {
+        .where('post.post_isapproved = :post_isapproved', {
           post_isapproved: isapproved,
         })
         .getMany();
@@ -444,14 +479,14 @@ export class PostRepository extends Repository<PostEntity> {
         res.send({
           code: 201,
           data: fullscreenpost,
-          message :"data is available",
+          message: 'data is available',
           received: true,
         });
       } else {
         res.send({
           code: 302,
           data: null,
-          message :"data not found",
+          message: 'data not found',
           received: false,
         });
       }
@@ -460,7 +495,7 @@ export class PostRepository extends Repository<PostEntity> {
         res.send({
           code: 402,
           data: null,
-          message :"something went wrong,try again",
+          message: 'something went wrong,try again',
           received: false,
         });
       }
@@ -478,7 +513,7 @@ export class PostRepository extends Repository<PostEntity> {
         .set({
           post_isapproved,
         })
-        .where("post.post_id = :post_id", { post_id })
+        .where('post.post_id = :post_id', { post_id })
         .execute()
         .then((data: any) => {
           var isAffected = data.affected;
@@ -486,13 +521,13 @@ export class PostRepository extends Repository<PostEntity> {
           if (isAffected > 0) {
             return res.send({
               code: 201,
-              message: "updated Sucessfully",
+              message: 'updated Sucessfully',
               submitted: true,
             });
           } else {
             return res.send({
               code: 301,
-              message: "not updated user not found",
+              message: 'not updated user not found',
               submitted: false,
             });
           }
@@ -501,14 +536,14 @@ export class PostRepository extends Repository<PostEntity> {
           console.log(error);
           return res.send({
             code: 401,
-            message: "something went wrong",
+            message: 'something went wrong',
             submitted: false,
           });
         });
     } else {
       return res.send({
         code: 303,
-        message: "your not admin",
+        message: 'your not admin',
         submitted: false,
       });
     }
@@ -522,20 +557,20 @@ export class PostRepository extends Repository<PostEntity> {
       .set({
         post_view,
       })
-      .where("post.post_id = :post_id", { post_id })
+      .where('post.post_id = :post_id', { post_id })
       .execute()
       .then((data: any) => {
         var isAffected = data.affected;
         if (isAffected > 0) {
           return res.send({
             code: 201,
-            message: "updated Sucessfully",
+            message: 'updated Sucessfully',
             submitted: true,
           });
         } else {
           return res.send({
             code: 301,
-            message: "not updated",
+            message: 'not updated',
             submitted: false,
           });
         }
@@ -544,7 +579,7 @@ export class PostRepository extends Repository<PostEntity> {
         console.log(error);
         return res.send({
           code: 401,
-          message: "something went wrong",
+          message: 'something went wrong',
           submitted: false,
         });
       });

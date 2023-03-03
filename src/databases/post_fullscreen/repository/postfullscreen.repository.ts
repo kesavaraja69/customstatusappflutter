@@ -1,14 +1,14 @@
-import { EntityRepository, getCustomRepository, Repository } from "typeorm";
-import { Request, Response } from "express";
-import dotenv from "dotenv";
-import { FullScreenPostEntity } from "../entity/postfullscreen.entity";
-import { UserRepository } from "../../authentication/repository/users.repositroy";
-import { CategoryRepository } from "../../categorys/repositroy/category.repositroy";
-import ImageKit from "imagekit";
+import { EntityRepository, getCustomRepository, Repository } from 'typeorm';
+import { Request, Response } from 'express';
+import dotenv from 'dotenv';
+import { FullScreenPostEntity } from '../entity/postfullscreen.entity';
+import { UserRepository } from '../../authentication/repository/users.repositroy';
+import { CategoryRepository } from '../../categorys/repositroy/category.repositroy';
+import ImageKit from 'imagekit';
 
-import fs from "fs";
-import multer from "multer";
-import { MyArrayslist, Root } from "../../../models/imagesdt";
+import fs from 'fs';
+import multer from 'multer';
+import { MyArrayslist, Root } from '../../../models/imagesdt';
 
 dotenv.config();
 @EntityRepository(FullScreenPostEntity)
@@ -24,6 +24,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       fs_post_videourl,
       fs_post_imageurl,
       fs_post_category,
+      fspostrewardpoint,
       useremail,
     } = req.body;
 
@@ -39,16 +40,17 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
     if (user !== undefined) {
       fullscreenentity.upload_user = user;
       if (admin_token === base_admin_sceret_kry) {
-        fullscreenentity.fs_post_isapproved = "true";
+        fullscreenentity.fs_post_isapproved = 'true';
       } else {
-        fullscreenentity.fs_post_isapproved = "false";
+        fullscreenentity.fs_post_isapproved = 'false';
       }
       fullscreenentity.fs_post_name = fs_post_name;
       fullscreenentity.fs_post_description = fs_post_description;
       fullscreenentity.fs_post_videourl = fs_post_videourl;
       fullscreenentity.fs_post_imageurl = fs_post_imageurl;
       fullscreenentity.fs_post_category = fs_post_category;
-      fullscreenentity.fs_post_view = "0";
+      fullscreenentity.fs_post_view = '0';
+      fullscreenentity.fs_post_rewardpoint = fspostrewardpoint;
       fullscreenentity.maincategory_post = parentsub_category_id!;
 
       await fullscreenentity
@@ -57,7 +59,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           if (data) {
             res.send({
               code: 201,
-              message: "fullscreen video added under database",
+              message: 'fullscreen video added under database',
               submitted: true,
             });
           }
@@ -66,7 +68,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           if (error) {
             res.send({
               code: 402,
-              message: "something went wrong ,try again",
+              message: 'something went wrong ,try again',
               submitted: false,
             });
           }
@@ -74,7 +76,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
     } else {
       res.send({
         code: 403,
-        message: "user not found",
+        message: 'user not found',
         submitted: false,
       });
     }
@@ -82,9 +84,9 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
   async fetchFullScreenPostDetailPage(req: Request, res: Response) {
     let { detail_id } = req.params;
     try {
-      let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
+      let fullscreenpost = await this.createQueryBuilder('fullscreenpost')
         .select()
-        .where("fullscreenpost.fs_post_id = :detail_id", { detail_id })
+        .where('fullscreenpost.fs_post_id = :detail_id', { detail_id })
         .getOne();
 
       if (fullscreenpost !== undefined) {
@@ -103,7 +105,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
     } catch (error) {
       res.send({
         code: 303,
-        data: "something went wrong",
+        data: 'something went wrong',
         recivied: false,
       });
     }
@@ -113,13 +115,13 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
     try {
       let { useremail } = req.params;
 
-      var response = await this.createQueryBuilder("fullscreenpost")
+      var response = await this.createQueryBuilder('fullscreenpost')
         // .leftJoinAndSelect("fullscreenpost.upload_user", "users")
-        .leftJoinAndSelect("fullscreenpost.post_fs_bookmark", "bookmark")
-        .leftJoin("bookmark.bookmark_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
-        .select(["fullscreenpost", "bookmark.bookmark_id"])
-        .andWhere("users.useremail = :useremail", {
+        .leftJoinAndSelect('fullscreenpost.post_fs_bookmark', 'bookmark')
+        .leftJoin('bookmark.bookmark_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
+        .select(['fullscreenpost', 'bookmark.bookmark_id'])
+        .andWhere('users.useremail = :useremail', {
           useremail,
         })
         .getMany();
@@ -131,7 +133,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       } else {
         return res.send({
           code: 301,
-          data: "no data available",
+          data: 'no data available',
         });
       }
     } catch (error) {
@@ -143,19 +145,19 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
     try {
       let { fs_post_id } = req.params;
 
-      var response = await this.createQueryBuilder("fullscreenpost")
-        .leftJoin("fullscreenpost.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      var response = await this.createQueryBuilder('fullscreenpost')
+        .leftJoin('fullscreenpost.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         .select([
-          "fullscreenpost",
-          "users.id",
-          "users.useremail",
-          "users.username",
-          "usersinfo.info_id",
-          "usersinfo.profileimage",
-          "usersinfo.customimage",
+          'fullscreenpost',
+          'users.id',
+          'users.useremail',
+          'users.username',
+          'usersinfo.info_id',
+          'usersinfo.profileimage',
+          'usersinfo.customimage',
         ])
-        .andWhere("fullscreenpost.fs_post_id = :fs_post_id", {
+        .andWhere('fullscreenpost.fs_post_id = :fs_post_id', {
           fs_post_id,
         })
         .getOne();
@@ -167,7 +169,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       } else {
         return res.send({
           code: 301,
-          data: "no data available",
+          data: 'no data available',
         });
       }
     } catch (error) {
@@ -183,9 +185,9 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
 
     let storage;
     var imagekit = new ImageKit({
-      publicKey: "public_QGV75szcjUrF3X3hQJs0tJvDt7U=",
-      privateKey: "private_lZW2yXVxaUU8fmbrtDChBN9jB0I=",
-      urlEndpoint: "https://ik.imagekit.io/mqplbpi4l",
+      publicKey: 'public_QGV75szcjUrF3X3hQJs0tJvDt7U=',
+      privateKey: 'private_lZW2yXVxaUU8fmbrtDChBN9jB0I=',
+      urlEndpoint: 'https://ik.imagekit.io/mqplbpi4l',
     });
 
     try {
@@ -201,50 +203,50 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       // });
 
       switch (filetype) {
-        case "fullscreenpost":
+        case 'fullscreenpost':
           storage = multer.diskStorage({
             destination: function (req, file, cb) {
-              cb(null, "./imageupload/fullscreenpostimage");
+              cb(null, './imageupload/fullscreenpostimage');
             },
             filename: function (req, file, cb) {
               cb(null, file.originalname);
             },
           });
           break;
-          case "profilepic":
-            storage = multer.diskStorage({
-              destination: function (req, file, cb) {
-                cb(null, "./imageupload/profilepic");
-              },
-              filename: function (req, file, cb) {
-                cb(null, file.originalname);
-              },
-            });
-            break;  
-        case "fullscreenpostvideo":
+        case 'profilepic':
           storage = multer.diskStorage({
             destination: function (req, file, cb) {
-              cb(null, "./imageupload/fullscreenpostvideo");
+              cb(null, './imageupload/profilepic');
             },
             filename: function (req, file, cb) {
               cb(null, file.originalname);
             },
           });
           break;
-        case "normalvideopost":
+        case 'fullscreenpostvideo':
           storage = multer.diskStorage({
             destination: function (req, file, cb) {
-              cb(null, "./imageupload/normalvideopost");
+              cb(null, './imageupload/fullscreenpostvideo');
             },
             filename: function (req, file, cb) {
               cb(null, file.originalname);
             },
           });
           break;
-        case "normalimagepost":
+        case 'normalvideopost':
           storage = multer.diskStorage({
             destination: function (req, file, cb) {
-              cb(null, "./imageupload/images");
+              cb(null, './imageupload/normalvideopost');
+            },
+            filename: function (req, file, cb) {
+              cb(null, file.originalname);
+            },
+          });
+          break;
+        case 'normalimagepost':
+          storage = multer.diskStorage({
+            destination: function (req, file, cb) {
+              cb(null, './imageupload/images');
             },
             filename: function (req, file, cb) {
               cb(null, file.originalname);
@@ -255,15 +257,15 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           break;
       }
 
-      if (filetype == "normalimagepost") {
+      if (filetype == 'normalimagepost') {
         let upload = multer({ storage: storage }).array(
-          "images",
+          'images',
           Number(imagno)
         );
         upload(req, res, async (err) => {
           if (err) {
             res.send({
-              message: "not uploaded",
+              message: 'not uploaded',
               data: null,
               code: 305,
             });
@@ -304,7 +306,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
             JSobj.myArrayslist[0].forEach(async (element, index, arrays) => {
               var data = JSobj.myArrayslist[0][index].path;
 
-              console.log("final path is " + data);
+              console.log('final path is ' + data);
 
               fs.readFile(
                 JSobj.myArrayslist[0][index].path,
@@ -314,17 +316,17 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
                   myArrays.push(
                     JSobj.myArrayslist[0][index].path
                       .toString()
-                      .replace("imageupload", "")
+                      .replace('imageupload', '')
                       .toString()
-                      .split("\\")
-                      .join("/")
+                      .split('\\')
+                      .join('/')
                   );
                   if (index === arrays.length - 1) {
                     if (myArrays != null) {
                       new Promise((f) => setTimeout(f, 2000));
                       res.send({
                         code: 201,
-                        message: "file uploaded",
+                        message: 'file uploaded',
                         imagedatalength: req.files?.length,
                         data: myArrays,
                         recivied: true,
@@ -398,40 +400,40 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
             });
           } else {
             res.send({
-              message: "not uploaded",
+              message: 'not uploaded',
               data: null,
               code: 303,
             });
           }
         });
       } else {
-        const upload = multer({ storage: storage }).single("image");
+        const upload = multer({ storage: storage }).single('image');
         upload(req, res, (err) => {
           if (err) {
             res.send({
-              message: "not uploaded",
+              message: 'not uploaded',
               data: null,
               code: 302,
             });
           }
           console.log(`file path ${req.file?.path}`);
-          fs.readFile(`${req.file?.path}`, "utf8", function (err, data) {
+          fs.readFile(`${req.file?.path}`, 'utf8', function (err, data) {
             if (err) throw err; // Fail if the file can't be read.
             if (err) {
               res.send({
-                message: "not uploaded",
+                message: 'not uploaded',
                 data: null,
                 code: 301,
               });
             }
             res.send({
-              message: "uplaod sucessfully",
+              message: 'uplaod sucessfully',
               data: `${req.file?.path
                 .toString()
-                .replace("imageupload", "")
+                .replace('imageupload', '')
                 .toString()
-                .split("\\")
-                .join("/")}`,
+                .split('\\')
+                .join('/')}`,
               code: 201,
             });
             //  console.log(req.file);
@@ -450,7 +452,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       }
     } catch (error) {
       res.send({
-        message: "not uploaded",
+        message: 'not uploaded',
         data: null,
         code: 403,
       });
@@ -559,18 +561,18 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       //   });
       // }
 
-      let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
-        .leftJoinAndSelect("fullscreenpost.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      let fullscreenpost = await this.createQueryBuilder('fullscreenpost')
+        .leftJoinAndSelect('fullscreenpost.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         .take(dataindex)
         .select([
-          "fullscreenpost",
-          "users.id",
-          "users.useremail",
-          "users.username",
-          "usersinfo.info_id",
-          "usersinfo.profileimage",
-          "usersinfo.customimage",
+          'fullscreenpost',
+          'users.id',
+          'users.useremail',
+          'users.username',
+          'usersinfo.info_id',
+          'usersinfo.profileimage',
+          'usersinfo.customimage',
         ])
         .getMany();
 
@@ -590,7 +592,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
     } catch (error) {
       res.send({
         code: 303,
-        data: "something went wrong",
+        data: 'something went wrong',
         recivied: false,
       });
     }
@@ -598,17 +600,17 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
 
   async fetchFullScreenPost(req: Request, res: Response) {
     try {
-      let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
-        .leftJoinAndSelect("fullscreenpost.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      let fullscreenpost = await this.createQueryBuilder('fullscreenpost')
+        .leftJoinAndSelect('fullscreenpost.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         .select([
-          "fullscreenpost",
-          "users.id",
-          "users.useremail",
-          "users.username",
-          "usersinfo.info_id",
-          "usersinfo.profileimage",
-          "usersinfo.customimage",
+          'fullscreenpost',
+          'users.id',
+          'users.useremail',
+          'users.username',
+          'usersinfo.info_id',
+          'usersinfo.profileimage',
+          'usersinfo.customimage',
         ])
         .getMany();
       if (fullscreenpost !== undefined) {
@@ -628,7 +630,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       if (error) {
         res.send({
           code: 402,
-          data: "something went wrong,try again",
+          data: 'something went wrong,try again',
           received: false,
         });
       }
@@ -638,19 +640,19 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
   async fetchFullScreenPostappall(req: Request, res: Response) {
     let { isapproved } = req.params;
     try {
-      let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
-        .leftJoinAndSelect("fullscreenpost.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      let fullscreenpost = await this.createQueryBuilder('fullscreenpost')
+        .leftJoinAndSelect('fullscreenpost.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         .select([
-          "fullscreenpost",
-          "users.id",
-          "users.useremail",
-          "users.username",
-          "usersinfo.info_id",
-          "usersinfo.profileimage",
-          "usersinfo.customimage",
+          'fullscreenpost',
+          'users.id',
+          'users.useremail',
+          'users.username',
+          'usersinfo.info_id',
+          'usersinfo.profileimage',
+          'usersinfo.customimage',
         ])
-        .where("fullscreenpost.fs_post_isapproved = :fs_post_isapproved", {
+        .where('fullscreenpost.fs_post_isapproved = :fs_post_isapproved', {
           fs_post_isapproved: isapproved,
         })
         .getMany();
@@ -658,14 +660,14 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
         res.send({
           code: 201,
           data: fullscreenpost,
-          message: "data is available",
+          message: 'data is available',
           received: true,
         });
       } else {
         res.send({
           code: 302,
           data: null,
-          message: "data not found",
+          message: 'data not found',
           received: false,
         });
       }
@@ -674,7 +676,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
         res.send({
           code: 402,
           data: null,
-          message: "something went wrong,try again",
+          message: 'something went wrong,try again',
           received: false,
         });
       }
@@ -685,20 +687,20 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
   async fetchFullScreenPostallnotapproved(req: Request, res: Response) {
     try {
       let item;
-      let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
-        .leftJoinAndSelect("fullscreenpost.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      let fullscreenpost = await this.createQueryBuilder('fullscreenpost')
+        .leftJoinAndSelect('fullscreenpost.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         .select([
-          "fullscreenpost",
-          "users.id",
-          "users.useremail",
-          "users.username",
-          "usersinfo.info_id",
-          "usersinfo.profileimage",
-          "usersinfo.customimage",
+          'fullscreenpost',
+          'users.id',
+          'users.useremail',
+          'users.username',
+          'usersinfo.info_id',
+          'usersinfo.profileimage',
+          'usersinfo.customimage',
         ])
-        .where("fullscreenpost.fs_post_isapproved = :fs_post_isapproved", {
-          fs_post_isapproved: "false",
+        .where('fullscreenpost.fs_post_isapproved = :fs_post_isapproved', {
+          fs_post_isapproved: 'false',
         })
         .getMany();
       if (fullscreenpost !== undefined) {
@@ -718,7 +720,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       if (error) {
         res.send({
           code: 402,
-          data: "something went wrong,try again",
+          data: 'something went wrong,try again',
           received: false,
         });
       }
@@ -728,20 +730,20 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
   async fetchFullScreenPostbycategoryid(req: Request, res: Response) {
     let { parent_category_id } = req.params;
     try {
-      let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
-        .leftJoinAndSelect("fullscreenpost.maincategory_post", "category")
-        .leftJoinAndSelect("fullscreenpost.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      let fullscreenpost = await this.createQueryBuilder('fullscreenpost')
+        .leftJoinAndSelect('fullscreenpost.maincategory_post', 'category')
+        .leftJoinAndSelect('fullscreenpost.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         .select([
-          "fullscreenpost",
-          "users.id",
-          "users.useremail",
-          "users.username",
-          "usersinfo.info_id",
-          "usersinfo.profileimage",
-          "usersinfo.customimage",
+          'fullscreenpost',
+          'users.id',
+          'users.useremail',
+          'users.username',
+          'usersinfo.info_id',
+          'usersinfo.profileimage',
+          'usersinfo.customimage',
         ])
-        .andWhere("category.category_id = :parent_category_id", {
+        .andWhere('category.category_id = :parent_category_id', {
           parent_category_id,
         })
         .getMany();
@@ -762,7 +764,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       if (error) {
         res.send({
           code: 402,
-          data: "something went wrong,try again",
+          data: 'something went wrong,try again',
           received: false,
         });
       }
@@ -772,11 +774,11 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
   async fetchdownloadsFullScreenPostbyuser(req: Request, res: Response) {
     let { useremail } = req.params;
     try {
-      let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
-        .leftJoinAndSelect("fullscreenpost.post_fs_download", "download")
-        .leftJoin("download.downloads_user", "users")
-        .select(["fullscreenpost", "download.download_id"])
-        .andWhere("users.useremail = :useremail", { useremail })
+      let fullscreenpost = await this.createQueryBuilder('fullscreenpost')
+        .leftJoinAndSelect('fullscreenpost.post_fs_download', 'download')
+        .leftJoin('download.downloads_user', 'users')
+        .select(['fullscreenpost', 'download.download_id'])
+        .andWhere('users.useremail = :useremail', { useremail })
         .getMany();
       if (fullscreenpost !== undefined) {
         res.send({
@@ -795,7 +797,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       if (error) {
         res.send({
           code: 402,
-          data: "something went wrong,try again",
+          data: 'something went wrong,try again',
           received: false,
         });
       }
@@ -805,19 +807,19 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
   async fetchFullScreenPostbyuser(req: Request, res: Response) {
     let { useremail } = req.params;
     try {
-      let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
-        .leftJoinAndSelect("fullscreenpost.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      let fullscreenpost = await this.createQueryBuilder('fullscreenpost')
+        .leftJoinAndSelect('fullscreenpost.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         .select([
-          "fullscreenpost",
-          "users.id",
-          "users.useremail",
-          "users.username",
-          "usersinfo.info_id",
-          "usersinfo.profileimage",
-          "usersinfo.customimage",
+          'fullscreenpost',
+          'users.id',
+          'users.useremail',
+          'users.username',
+          'usersinfo.info_id',
+          'usersinfo.profileimage',
+          'usersinfo.customimage',
         ])
-        .where("users.useremail = :useremail", { useremail })
+        .where('users.useremail = :useremail', { useremail })
         .getMany();
       if (fullscreenpost !== undefined) {
         res.send({
@@ -836,7 +838,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       if (error) {
         res.send({
           code: 402,
-          data: "something went wrong,try again",
+          data: 'something went wrong,try again',
           received: false,
         });
       }
@@ -846,14 +848,14 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
   async fetchallFullScreenPost(req: Request, res: Response) {
     try {
       let { sub_category_id, parent_category_id } = req.params;
-      let fullscreenpost = await this.createQueryBuilder("fullscreenpost")
-        .leftJoinAndSelect("fullscreenpost.category_post", "subcategory")
-        .leftJoinAndSelect("subcategory.parent_catergory", "category")
+      let fullscreenpost = await this.createQueryBuilder('fullscreenpost')
+        .leftJoinAndSelect('fullscreenpost.category_post', 'subcategory')
+        .leftJoinAndSelect('subcategory.parent_catergory', 'category')
         .select()
-        .where("subcategory.sub_category_id = :sub_category_id", {
+        .where('subcategory.sub_category_id = :sub_category_id', {
           sub_category_id,
         })
-        .andWhere("category.category_id = :parent_category_id", {
+        .andWhere('category.category_id = :parent_category_id', {
           parent_category_id,
         })
         .getMany();
@@ -869,7 +871,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       if (error) {
         res.send({
           code: 402,
-          data: "something went wrong,try again",
+          data: 'something went wrong,try again',
           received: false,
         });
       }
@@ -880,24 +882,24 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
   async fetchComment(req: Request, res: Response) {
     let { fs_post_id } = req.params;
     try {
-      let response = await this.createQueryBuilder("fullscreenpost")
-        .leftJoinAndSelect("fullscreenpost.post_fs_comment", "comment")
-        .leftJoinAndSelect("fullscreenpost.upload_user", "users")
-        .leftJoinAndSelect("users.info", "usersinfo")
+      let response = await this.createQueryBuilder('fullscreenpost')
+        .leftJoinAndSelect('fullscreenpost.post_fs_comment', 'comment')
+        .leftJoinAndSelect('fullscreenpost.upload_user', 'users')
+        .leftJoinAndSelect('users.info', 'usersinfo')
         .select()
-        .where("fullscreenpost.fs_post_id = :fs_post_id", { fs_post_id })
+        .where('fullscreenpost.fs_post_id = :fs_post_id', { fs_post_id })
         .getMany();
       let data1 = response.length > 0;
       if (!data1) {
         return res.send({
           code: 204,
-          message: "data is empty",
+          message: 'data is empty',
           data: null,
         });
       } else {
         return res.send({
           code: 201,
-          message: "data avalaible",
+          message: 'data avalaible',
           data: response,
         });
       }
@@ -905,7 +907,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       if (error) {
         return res.send({
           code: 401,
-          message: "something went wrong",
+          message: 'something went wrong',
           data: null,
         });
       }
@@ -923,7 +925,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
         .set({
           fs_post_isapproved,
         })
-        .where("fullscreenpost.fs_post_id = :fs_post_id", { fs_post_id })
+        .where('fullscreenpost.fs_post_id = :fs_post_id', { fs_post_id })
         .execute()
         .then((data: any) => {
           var isAffected = data.affected;
@@ -931,13 +933,13 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           if (isAffected > 0) {
             return res.send({
               code: 201,
-              message: "updated Sucessfully",
+              message: 'updated Sucessfully',
               submitted: true,
             });
           } else {
             return res.send({
               code: 301,
-              message: "not updated user not found",
+              message: 'not updated user not found',
               submitted: false,
             });
           }
@@ -946,14 +948,14 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
           console.log(error);
           return res.send({
             code: 401,
-            message: "something went wrong",
+            message: 'something went wrong',
             submitted: false,
           });
         });
     } else {
       return res.send({
         code: 303,
-        message: "your not admin",
+        message: 'your not admin',
         submitted: false,
       });
     }
@@ -967,7 +969,7 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
       .set({
         fs_post_view,
       })
-      .where("fullscreenpost.fs_post_id = :fs_post_id", { fs_post_id })
+      .where('fullscreenpost.fs_post_id = :fs_post_id', { fs_post_id })
       .execute()
       .then((data: any) => {
         var isAffected = data.affected;
@@ -975,13 +977,13 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
         if (isAffected > 0) {
           return res.send({
             code: 201,
-            message: "updated Sucessfully",
+            message: 'updated Sucessfully',
             submitted: true,
           });
         } else {
           return res.send({
             code: 301,
-            message: "not updated user not found",
+            message: 'not updated user not found',
             submitted: false,
           });
         }
@@ -990,9 +992,48 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
         console.log(error);
         return res.send({
           code: 401,
-          message: "something went wrong",
+          message: 'something went wrong',
           submitted: false,
         });
       });
+  }
+
+  async removefullscnpost(req: Request, res: Response) {
+    try {
+      let { fspostid } = req.params;
+      await this.createQueryBuilder('fullscreenpost')
+        .delete()
+        .from(FullScreenPostEntity)
+        .where('fs_post_id = :fspostid', { fspostid })
+        .execute()
+        .then((data: any) => {
+          let isAffected = data.affected;
+          if (isAffected > 0) {
+            return res.send({
+              code: 201,
+              data: 'fullscn post removed',
+              removed: true,
+            });
+          } else {
+            return res.send({
+              code: 301,
+              data: 'not removed',
+              removed: false,
+            });
+          }
+        })
+        .catch((error: any) => {
+          if (error !== undefined) {
+            console.log(error);
+            return res.send({
+              code: 403,
+              data: 'something went wrong',
+              removed: false,
+            });
+          }
+        });
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
