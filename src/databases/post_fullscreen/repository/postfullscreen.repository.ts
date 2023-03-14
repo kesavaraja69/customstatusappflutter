@@ -9,6 +9,7 @@ import ImageKit from 'imagekit';
 import fs from 'fs';
 import multer from 'multer';
 import { MyArrayslist, Root } from '../../../models/imagesdt';
+import path from 'path';
 
 dotenv.config();
 @EntityRepository(FullScreenPostEntity)
@@ -456,6 +457,169 @@ export class FullScreenPostRepository extends Repository<FullScreenPostEntity> {
         data: null,
         code: 403,
       });
+    }
+  }
+
+  async imageuploadtoStorageserver(req: Request, res: Response) {
+    let { filetype, imagno } = req.params;
+    let myArrays: Array<any> = [];
+
+    let myArrayslist: Array<any> = [];
+
+    const ftp = require('basic-ftp');
+    var FTPStorage = require('multer-ftp');
+
+    ftp.verbose = true;
+
+    try {
+      if (filetype == 'normalimagepost') {
+        const upload = multer({
+          storage: new FTPStorage({
+            basepath: '/remote/Fullscreenvideo',
+            ftp: {
+              host: process.env.DRFTPHost,
+              user: process.env.DRFTPUser,
+              password: process.env.DRFTPPwd,
+              secure: false,
+            },
+            destination: function (
+              req: Request,
+              file: any,
+              options: any,
+              callback: any
+            ) {
+              const path =
+                '/uploadtamilstatusapp/PostImages/' +
+                Date.now() +
+                file.originalname;
+              callback(null, path);
+            },
+          }),
+        }).array('images', Number(imagno));
+
+        upload(req, res, (err) => {
+          if (err) {
+            res.send({
+              message: 'not uploaded',
+              data: null,
+              code: 302,
+            });
+          }
+          console.log(`file path ${req.files}`);
+          myArrayslist.push(req.files);
+
+          const JSON_string = JSON.stringify({ myArrayslist });
+          console.log(JSON_string);
+          let JSobj: Root = JSON.parse(JSON_string);
+
+          if (JSobj.myArrayslist[0] !== undefined) {
+            JSobj.myArrayslist[0].forEach(async (element, index, arrays) => {
+              var data = JSobj.myArrayslist[0][index].path;
+
+              console.log('final path is ' + data);
+
+              myArrays.push(
+                `https://dragonfistztamilan.in/TmlSts${JSobj.myArrayslist[0][index].path}`
+              );
+              if (index === arrays.length - 1) {
+                if (myArrays != null) {
+                  new Promise((f) => setTimeout(f, 2000));
+                  res.send({
+                    code: 201,
+                    message: 'file uploaded',
+                    imagedatalength: req.files?.length,
+                    data: myArrays,
+                    recivied: true,
+                  });
+                }
+              }
+            });
+            // res.send({
+            //   code: 201,
+            //   message: 'file uploaded',
+            //   imagedatalength: req.files?.length,
+            //   data: JSobj.myArrayslist[0],
+            //   recivied: true,
+            // });
+          } else {
+            res.send({
+              message: 'not uploaded',
+              data: null,
+              code: 303,
+            });
+          }
+        });
+      } else {
+        const upload = multer({
+          storage: new FTPStorage({
+            basepath: '/remote/Fullscreenvideo',
+            ftp: {
+              host: process.env.DRFTPHost,
+              user: process.env.DRFTPUser,
+              password: process.env.DRFTPPwd,
+              secure: false,
+            },
+            destination: function (
+              req: Request,
+              file: any,
+              options: any,
+              callback: any
+            ) {
+              if (filetype == 'fullscreenpost') {
+                //  const path = '/picfinal/test/' + Date.now() + file.originalname;
+                const path =
+                  '/uploadtamilstatusapp/FullScreenvideoimage/' +
+                  Date.now() +
+                  file.originalname;
+                callback(null, path);
+              } else if (filetype == 'profilepic') {
+                const path =
+                  '/uploadtamilstatusapp/ProfilePics/' +
+                  Date.now() +
+                  file.originalname;
+                callback(null, path);
+              } else if (filetype == 'fullscreenpostvideo') {
+                const path =
+                  '/uploadtamilstatusapp/Fullscreenvideo/' +
+                  Date.now() +
+                  file.originalname;
+                callback(null, path);
+              } else if (filetype == 'normalvideopost') {
+                const path =
+                  '/uploadtamilstatusapp/Normalvideo/' +
+                  Date.now() +
+                  file.originalname;
+                callback(null, path);
+              }
+              //  const path = '/Fullscreenvideo/' + Date.now() + file.originalname;
+            },
+          }),
+        }).single('image');
+
+        upload(req, res, (err) => {
+          if (err) {
+            res.send({
+              message: 'not uploaded',
+              data: null,
+              code: 302,
+            });
+          }
+          res.send({
+            message: 'uploaded',
+            data: `https://dragonfistztamilan.in/TmlSts${req.file?.path}`,
+            code: 201,
+          });
+        });
+      }
+    } catch (err) {
+      console.log(err);
+      if (err) {
+        res.send({
+          message: 'not uploaded',
+          data: null,
+          code: 402,
+        });
+      }
     }
   }
 

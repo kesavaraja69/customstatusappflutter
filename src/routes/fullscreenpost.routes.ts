@@ -66,6 +66,17 @@ fullscreenpostRouter.patch(
   '/addimagelocal/:filetype',
   FullScreenVideoController.imagekitioupload
 );
+
+fullscreenpostRouter.patch(
+  '/addimagetoserver/:filetype',
+  FullScreenVideoController.imageuploadtoStorageserver
+);
+
+fullscreenpostRouter.patch(
+  '/addimagestoserver/:filetype/:imagno',
+  FullScreenVideoController.imageuploadtoStorageserver
+);
+
 fullscreenpostRouter.patch(
   '/addimageslocal/:filetype/:imagno',
   FullScreenVideoController.imagekitioupload

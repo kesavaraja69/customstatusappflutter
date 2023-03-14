@@ -8,6 +8,11 @@ export class FullScreenVideoController {
     await subcategoryRepository.imagekitioupload(req, res);
   }
 
+  static async imageuploadtoStorageserver(req: Request, res: Response) {
+    let subcategoryRepository = getCustomRepository(FullScreenPostRepository);
+    await subcategoryRepository.imageuploadtoStorageserver(req, res);
+  }
+
   static async fetchFullScreenPostwithlimit(req: Request, res: Response) {
     let subcategoryRepository = getCustomRepository(FullScreenPostRepository);
     await subcategoryRepository.fetchFullScreenPostwithlimit(req, res);
