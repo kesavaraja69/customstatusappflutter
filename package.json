@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "TamilStatusApp",
   "main": "index.js",
   "engines": {
     "node": "v16.18.0",
